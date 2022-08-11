@@ -4,32 +4,43 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"strings"
 )
 
-func BuildDiagram(poms []Pom) string {
-	s := "@startuml\n\n"
-	for _, pom := range poms {
-		s = s + "[" + pom.ArtifactId + "]\n"
-	}
-	s = s + "\n"
-	for _, pom := range poms {
-		for _, p := range PointedBy(pom, poms) {
-			s = s + "[" + p.ArtifactId + "] -DOWN-> [" + pom.ArtifactId + "]\n"
-		}
-	}
-	s = s + "\n@enduml"
-	return s
-}
-
 func main() {
-	log.Println("Started POM Planter ================================================================================================")
+	log.Println("Started JasperReports Cleaner ================================================================================================")
 	if len(os.Args) < 2 {
-		log.Fatalln("Missing POM file name")
+		log.Fatalln("Missing JRXML file name")
 		return
 	}
-	var poms []Pom = make([]Pom, 0)
-	poms = ReadTreePOM(os.Args[1], "root", poms)
-	diagram := BuildDiagram(poms)
-	fmt.Println(diagram)
-	log.Println("Finished POM Planter ===============================================================================================")
+	var fileName = os.Args[1]
+	var report = ReadJasperReport(fileName)
+	content, error := os.ReadFile(fileName)
+	if error != nil {
+		log.Fatal(error)
+	}
+	unused := make([]string, 0)
+	for _, field := range report.Fields {
+		if !strings.Contains(string(content[:]), "$F{"+field.Name+"}") {
+			unused = append(unused, "Field: "+field.Name)
+		}
+	}
+	for _, parameter := range report.Parameters {
+		if !strings.Contains(string(content[:]), "$P{"+parameter.Name+"}") {
+			unused = append(unused, "Parameter: "+parameter.Name)
+		}
+	}
+	for _, variable := range report.Variables {
+		if !strings.Contains(string(content[:]), "$V{"+variable.Name+"}") {
+			unused = append(unused, "Variable: "+variable.Name)
+		}
+	}
+	if len(unused) > 0 {
+		for _, s := range unused {
+			fmt.Println(s)
+		}
+	} else {
+		fmt.Println("No unused fields, parameters or variables!")
+	}
+	log.Println("Finished JasperReports Cleaner ===============================================================================================")
 }

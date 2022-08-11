@@ -2,10 +2,8 @@ package main
 
 import (
 	"encoding/xml"
-	"fmt"
 	"io/ioutil"
 	"log"
-	"os"
 )
 
 type JasperReport struct {
@@ -41,23 +39,4 @@ func ReadJasperReport(fileName string) *JasperReport {
 		panic(err)
 	}
 	return report
-}
-
-func main() {
-	log.Println("Started JasperReports Cleaner ================================================================================================")
-	if len(os.Args) < 2 {
-		log.Fatalln("Missing JRXML file name")
-		return
-	}
-	var report = ReadJasperReport(os.Args[1])
-	for _, field := range report.Fields {
-		fmt.Println("$F{" + field.Name + "}")
-	}
-	for _, parameter := range report.Parameters {
-		fmt.Println("$P{" + parameter.Name + "}")
-	}
-	for _, variable := range report.Variables {
-		fmt.Println("$V{" + variable.Name + "}")
-	}
-	log.Println("Finished JasperReports Cleaner ===============================================================================================")
 }
