@@ -5,8 +5,10 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 
 import lombok.Data;
+import lombok.Generated;
 
 @Data
+@Generated
 @XmlAccessorType(XmlAccessType.FIELD)
 public class Variable {
 

@@ -2,7 +2,10 @@ package de.ollie.jrc.jrxml;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.fail;
+
+import javax.xml.bind.UnmarshalException;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -55,6 +58,13 @@ class FileReaderTest {
 		@Test
 		void returndJasperReportHasVariables() throws Exception {
 			assertFalse(unitUnderTest.readFromFile().getVariables().isEmpty());
+		}
+
+		@Test
+		void throwsAnExceptionForNoJasperReportFiles() throws Exception {
+			assertThrows(
+					UnmarshalException.class,
+					() -> new FileReader("src/test/resources/test-report/NoJasperReport.jrxml").readFromFile());
 		}
 
 	}

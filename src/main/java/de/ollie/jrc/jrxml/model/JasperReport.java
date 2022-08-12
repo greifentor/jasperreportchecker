@@ -9,8 +9,10 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
 import lombok.Data;
+import lombok.Generated;
 
 @Data
+@Generated
 @XmlRootElement(namespace = "")
 @XmlAccessorType(XmlAccessType.FIELD) // That's vital to use the other annotations.
 public class JasperReport {

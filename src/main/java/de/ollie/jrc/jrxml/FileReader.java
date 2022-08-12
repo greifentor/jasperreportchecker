@@ -39,8 +39,10 @@ public class FileReader {
 
 	private void cleanUpJasperReportTag() {
 		int i = findFirstLineWithJasperReportTag();
-		lines.remove(i);
-		lines.add(i, "<jasperReport>");
+		if (i > -1) {
+			lines.remove(i);
+			lines.add(i, "<jasperReport>");
+		}
 	}
 
 	private int findFirstLineWithJasperReportTag() {
