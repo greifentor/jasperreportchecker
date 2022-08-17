@@ -14,12 +14,21 @@ public class JRC {
 	private static final PrintStream OUT = System.out;
 
 	public static void main(String[] args) {
-		try {
-			FILE_NAME_PROVIDER.getFileNamesFromCommandLineParameters(args).forEach(JRC::checkForFile);
-		} catch (ParseException pe) {
-			OUT.println("ParseException: " + pe.getMessage());
-		} catch (RuntimeException rte) {
-			OUT.println("RuntimeException: " + (rte.getMessage() == null ? rte.getCause() : rte.getMessage()));
+		if ((args == null) || (args.length == 0) || "help".equalsIgnoreCase(args[0])) {
+			OUT.println("\nUsage: [command] {parameters}\n");
+			OUT.println("commands:");
+			OUT.println("\n  check");
+			OUT.println("    - checks for unused fields, parameters and variables.");
+			OUT.println("    - parameters:");
+			OUT.println("        -f FILE_NAME[,FILE_NAME]");
+		} else if ("check".equalsIgnoreCase(args[0])) {
+			try {
+				FILE_NAME_PROVIDER.getFileNamesFromCommandLineParameters(args).forEach(JRC::checkForFile);
+			} catch (ParseException pe) {
+				OUT.println("ParseException: " + pe.getMessage());
+			} catch (RuntimeException rte) {
+				OUT.println("RuntimeException: " + (rte.getMessage() == null ? rte.getCause() : rte.getMessage()));
+			}
 		}
 		OUT.println();
 	}

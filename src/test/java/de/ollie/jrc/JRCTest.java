@@ -11,7 +11,7 @@ class JRCTest {
 	@Test
 	void runsWithoutException() {
 		try {
-			JRC.main(new String[] { "-f", XML_FILE_NAME });
+			JRC.main(new String[] { "check", "-f", XML_FILE_NAME });
 		} catch (Exception e) {
 			fail("should not throw an exception, but was: " + e.getClass().getSimpleName() + ": " + e.getMessage());
 		}
@@ -27,9 +27,27 @@ class JRCTest {
 	}
 
 	@Test
+	void noExceptionForEmptyParameters() {
+		try {
+			JRC.main(new String[0]);
+		} catch (Exception e) {
+			fail("should not throw an exception, but was: " + e.getClass().getSimpleName() + ": " + e.getMessage());
+		}
+	}
+
+	@Test
+	void noExceptionForHelpParameters() {
+		try {
+			JRC.main(new String[] { "help" });
+		} catch (Exception e) {
+			fail("should not throw an exception, but was: " + e.getClass().getSimpleName() + ": " + e.getMessage());
+		}
+	}
+
+	@Test
 	void noExceptionForNoFileParameters() {
 		try {
-			JRC.main(new String[] { "aString" });
+			JRC.main(new String[] { "check", "aString" });
 		} catch (Exception e) {
 			fail("should not throw an exception, but was: " + e.getClass().getSimpleName() + ": " + e.getMessage());
 		}
