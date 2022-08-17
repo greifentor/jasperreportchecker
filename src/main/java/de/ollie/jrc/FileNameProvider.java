@@ -12,7 +12,7 @@ import de.ollie.jrc.util.StringListSplitter;
 
 public class FileNameProvider {
 
-	public static final StringListSplitter stringListSplitter = new StringListSplitter();
+	public static final StringListSplitter STRING_LIST_SPLITTER = new StringListSplitter();
 
 	public List<String> getFileNamesFromCommandLineParameters(String[] args) throws ParseException {
 		Options options = new Options();
@@ -23,7 +23,7 @@ public class FileNameProvider {
 
 	private static List<String> getFilesToCheck(CommandLine cmd) {
 		if (cmd.hasOption("f")) {
-			return stringListSplitter.split(cmd.getOptionValue("f"));
+			return STRING_LIST_SPLITTER.split(cmd.getOptionValue("f"));
 		}
 		return new ArrayList<>();
 	}
