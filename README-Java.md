@@ -20,10 +20,26 @@ from CLI.
 
 # Start
 
-Thr programm could be started via CLI
+The program could be started via CLI
 
-```java -jar target/jasperreportscleaner-0.1.0.jar -f fileName[,fileName]```
+```java -jar target/jasperreportscleaner-0.1.0.jar COMMAND OPTIONS```
 
 The version "0.1.0" may change.
 
-The application will list unused fields, parameters and variables on the console.
+The application will execute the passed command with the passed options.
+
+## Commands
+
+### Check
+
+This command (```check```) starts a check for unused fields, parameters and variables in JRXML files
+specified by the passed options.
+
+#### Options
+
+* -d DIRECTORY_NAME - sets a directory to search into for a pattern specified by the ```-p``` option. Is set to "." if not passed. Also sub directories will be processed.
+* -f FILE_NAME[,FILE_NAME] - specifies matching file names to process.
+* -p PATTERN - sets a pattern for search matching files (e. g. "*.JRXML").
+
+All options could be used together with a single ```check``` command call and add matching files to a
+single list of files to respect in the application run.
