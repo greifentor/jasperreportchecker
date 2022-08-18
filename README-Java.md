@@ -46,4 +46,4 @@ All options could be used together with a single ```check``` command call and ad
 single list of files to respect in the application run.
 
 **Note:** There is a strange behavior with Windows Powershell: This CLI changes the pattern parameter to a list of 
-matching file names if there are some in the current directory.
+matching file names if there are some in the current directory. This argument list is not accepted by the application.
