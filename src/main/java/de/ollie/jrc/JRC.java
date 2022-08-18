@@ -17,9 +17,9 @@ public class JRC {
 
 	public static void main(String[] args) {
 		try {
-			// List.of(args).forEach(c -> out.println(c));
+			// List.of(args).forEach(c -> out.println("A: " + c));
 			CommandLine cmd = new CommandLineParser().parse(args);
-			// List.of(cmd.getOptions()).forEach(c -> out.println(c.getOpt() + " - " + c.getValue()));
+			// List.of(cmd.getOptions()).forEach(c -> out.println("P: " + c.getOpt() + " - " + c.getValue()));
 			boolean somethingPrinted = true;
 			if ((args == null) || (args.length == 0) || "help".equalsIgnoreCase(args[0])) {
 				out.println("\nUsage: [command] {parameters}\n");
