@@ -66,20 +66,43 @@ class JRCTest {
 
 	@Test
 	void passNoExistingFile_printsAnErrorMessage() {
-		String fileName = ":o)";
+		String fileName = "not/existing/f.ile";
 		JRC.main(new String[] { "check", "-f", fileName });
-		assertTrue(baos.toString().startsWith("\nProcessing: " + fileName + "\nRuntimeException:"));
+		assertTrue(baos.toString().contains("NoSuchFileException:"));
 	}
 
 	@Test
-	void passFileWithNoUnusedObject_printsAnErrorMessage() {
+	void passFileWithNoUnusedObject_printsAMessage() {
 		String fileName = "src/test/resources/test-report/UnusedObjectChecker-NoUnused.jrxml";
 		JRC.main(new String[] { "check", "-f", fileName });
-		System.out.println(baos.toString());
 		assertTrue(
 				baos
 						.toString()
-						.startsWith("\nProcessing: " + fileName + "\nNo unused field, parameter or variable found."));
+						.contains("No unused field, parameter or variable found."));
 	}
 
+	@Test
+	void passFileWithNoUnusedObjectAndSuppressNothingFoundMessage_printsNothing() {
+		String fileName = "src/test/resources/test-report/UnusedObjectChecker-NoUnused.jrxml";
+		JRC.main(new String[] { "check", "-f", fileName, "-snfm" });
+		System.out.println("\"" + baos.toString() + "\"");
+		assertTrue(baos.toString().isEmpty());
+	}
+
+	@Test
+	void test() {
+		String dir =
+				"C:\\workspace\\basisdienst-dokumente-service-templates\\src\\main\\docker\\data\\kita\\efoeb-bedarfsbescheid\\";
+		JRC.main(new String[] { "check", "-d", dir, "-p", "*.jrxml" });
+		System.out.println(baos.toString());
+	}
+
+	@Test
+	void test0() {
+		String dir =
+				"C:/workspace/basisdienst-dokumente-service-templates/src/main/docker/data/kita/efoeb-bedarfsbescheid/";
+		JRC.main(new String[] { "check", "-d", dir, "-p", "*.jrxml", "-snfm" });
+		System.out.println(baos.toString());
+	}
+	
 }
