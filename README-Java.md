@@ -51,5 +51,5 @@ Instead of using the Powershell start the application via the simple (old) windo
 "Eingabeaufforderung"). Use '"' for the value of the ``-p`` parameter.
 
 ```
-java -jar C:\workspace\opensource\jasperreportchecker\target\jasperreportscleaner-1.0.0.jar check -d C:\workspace\document-project\ -p "*.jrxml"
+java -jar target\jasperreportscleaner-1.0.0.jar check -d C:\workspace\document-project\ -p "*.jrxml"
 ```
