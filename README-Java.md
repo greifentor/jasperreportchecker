@@ -47,3 +47,9 @@ single list of files to respect in the application run.
 
 **Note:** There is a strange behavior with Windows Powershell: This CLI changes the pattern parameter to a list of 
 matching file names if there are some in the current directory. This argument list is not accepted by the application.
+Instead of using the Powershell start the application via the simple (old) windows command line (german
+"Eingabeaufforderung"). Use '"' for the value of the ``-p`` parameter.
+
+```
+java -jar C:\workspace\opensource\jasperreportchecker\target\jasperreportscleaner-1.0.0.jar check -d C:\workspace\document-project\ -p "*.jrxml"
+```
