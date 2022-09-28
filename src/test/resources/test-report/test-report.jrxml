@@ -7,7 +7,9 @@
 		<![CDATA[]]>
 	</queryString>
 	<field name="unusedField" class="java.lang.String"/>
-	<field name="usedField" class="java.lang.String"/>
+	<field name="usedField" class="java.lang.String">
+		<fieldDescription><![CDATA[aFieldDescription]]></fieldDescription>
+	</field>
 	<variable name="usedVariable" class="java.lang.String"/>
 	<variable name="unusedVariable" class="java.lang.String"/>
 	<background>

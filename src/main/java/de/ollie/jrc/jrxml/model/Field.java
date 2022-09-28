@@ -6,7 +6,9 @@ import javax.xml.bind.annotation.XmlAttribute;
 
 import lombok.Data;
 import lombok.Generated;
+import lombok.experimental.Accessors;
 
+@Accessors(chain = true)
 @Data
 @Generated
 @XmlAccessorType(XmlAccessType.FIELD)
@@ -14,5 +16,7 @@ public class Field {
 
 	@XmlAttribute
 	private String name;
+
+	private String fieldDescription;
 
 }

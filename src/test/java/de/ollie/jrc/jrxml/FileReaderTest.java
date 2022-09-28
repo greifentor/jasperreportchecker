@@ -3,6 +3,7 @@ package de.ollie.jrc.jrxml;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
 import javax.xml.bind.UnmarshalException;
@@ -65,6 +66,27 @@ class FileReaderTest {
 			assertThrows(
 					UnmarshalException.class,
 					() -> new FileReader("src/test/resources/test-report/NoJasperReport.jrxml").readFromFile());
+		}
+
+		@Test
+		void setTheNameOfTheFieldCorrectly() throws Exception {
+			assertTrue(
+					unitUnderTest
+							.readFromFile()
+							.getFields()
+							.stream()
+							.anyMatch(field -> field.getName().equals("usedField")));
+		}
+
+		@Test
+		void setTheDescriptionOfTheFieldCorrectly() throws Exception {
+			assertTrue(
+					unitUnderTest
+							.readFromFile()
+							.findFieldByName("usedField")
+							.get()
+							.getFieldDescription()
+							.equals("aFieldDescription"));
 		}
 
 	}

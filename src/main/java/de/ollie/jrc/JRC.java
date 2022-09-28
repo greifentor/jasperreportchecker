@@ -31,6 +31,11 @@ public class JRC {
 				out.println("        -f FILE_NAME[,FILE_NAME]");
 				out.println("        -p PATTERN_TO_SEARCH_FOR (e. g. \"*.jrxml\")");
 				out.println("        -snfm (suppresses messages if nothing unused found)");
+				out.println("\n  xml");
+				out.println("    - creates sample xml templates for a JRXML file.");
+				out.println("    - parameters:");
+				out.println("        -f FILE_NAME (the name of the JRXML file which the sample is to create for)");
+				// out.println(" -o FILE_NAME (a name for the output file)");
 			} else if ("check".equalsIgnoreCase(args[0])) {
 				List<String> fileNames = FILE_NAME_PROVIDER.getFileNamesFromCommandLineParameters(cmd);
 				if (fileNames.isEmpty()) {
@@ -41,9 +46,11 @@ public class JRC {
 						.map(fileName -> checkForFile(fileName, cmd.hasOption("snfm")))
 						.reduce((b0, b1) -> b0 || b1)
 						.orElse(true);
+			} else if ("xml".equalsIgnoreCase(args[0])) {
+
 			}
 			if (somethingPrinted) {
-			out.println();
+				out.println();
 			}
 		} catch (ParseException pe) {
 			out.println("ParseException: " + pe.getMessage());
