@@ -1,5 +1,6 @@
 package de.ollie.jrc;
 
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
@@ -20,6 +21,11 @@ class JRCTest {
 	void prepareByteArrayOutputStream() {
 		baos = new ByteArrayOutputStream();
 		JRC.out = new PrintStream(baos);
+	}
+
+	@Test
+	void constructorThrowsAnException() {
+		assertThrows(UnsupportedOperationException.class, () -> new JRC());
 	}
 
 	@Test

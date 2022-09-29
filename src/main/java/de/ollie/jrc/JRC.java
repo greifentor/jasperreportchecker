@@ -15,6 +15,10 @@ public class JRC {
 	private static final FileNameProvider FILE_NAME_PROVIDER = new FileNameProvider();
 	private static final UnusedObjectChecker UNUSED_OBJECT_CHECKER = new UnusedObjectChecker();
 
+	JRC() {
+		throw new UnsupportedOperationException();
+	}
+
 	public static void main(String[] args) {
 		try {
 			CommandLine cmd = new CommandLineParser().parse(args);
