@@ -57,16 +57,16 @@ public class SampleXMLBuilder {
 		}
 
 		private void addFieldAsXMLNode() {
-			splitFieldDescriptionBySlashes();
+			splitFieldDescriptionBySlashesToPathElements();
 			setNameForXMLNodeFromFirstPathElement();
 			removeFirstPathElement();
 			while (hasMorePathElements()) {
-				findOrCreateNodeForFirstPathElement();
+				findOrCreateNodeForFirstPathElementAndAddToCurrentNode();
 				removeFirstPathElement();
 			}
 		}
 
-		private void splitFieldDescriptionBySlashes() {
+		private void splitFieldDescriptionBySlashesToPathElements() {
 			pathElements =
 					new PathElements(new ArrayList<>(List.of(StringUtils.split(field.getFieldDescription(), "/"))));
 		}
@@ -91,7 +91,7 @@ public class SampleXMLBuilder {
 			return pathElements.hasMoreElements();
 		}
 
-		private void findOrCreateNodeForFirstPathElement() {
+		private void findOrCreateNodeForFirstPathElementAndAddToCurrentNode() {
 			String nodeName = pathElements.getFirstElement();
 			List<XMLNode> matchingNodes = xmlNode.findAllNodesByName(nodeName);
 			if (matchingNodes.isEmpty()) {
