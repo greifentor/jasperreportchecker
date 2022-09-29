@@ -7,6 +7,7 @@ import org.apache.commons.lang3.StringUtils;
 
 import de.ollie.jrc.jrxml.model.Field;
 import de.ollie.jrc.jrxml.model.JasperReport;
+import de.ollie.jrc.xml.exception.DifferentRootNamesException;
 import de.ollie.jrc.xml.model.XMLNode;
 
 public class SampleXMLBuilder {
@@ -43,6 +44,9 @@ public class SampleXMLBuilder {
 		List<String> pathElements = new ArrayList<>(List.of(StringUtils.split(field.getFieldDescription(), "/")));
 		if (xmlNode.getName() == null) {
 			xmlNode.setName(pathElements.get(0));
+		} else if (!xmlNode.getName().equals(pathElements.get(0))) {
+			throw new DifferentRootNamesException(
+					"field description '" + field.getFieldDescription() + "' should start with:" + xmlNode.getName());
 		}
 		pathElements.remove(0);
 		while (!pathElements.isEmpty()) {
