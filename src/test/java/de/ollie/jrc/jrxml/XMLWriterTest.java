@@ -1,8 +1,10 @@
 package de.ollie.jrc.jrxml;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.verifyNoInteractions;
 
+import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
 import java.util.List;
 
@@ -24,6 +26,10 @@ public class XMLWriterTest {
 	@InjectMocks
 	private XMLWriter unitUnderTest;
 
+	private XMLNode createNode(String name) {
+		return new XMLNode().setName(name);
+	}
+
 	@Nested
 	class TestsOfMethod_write_XMLNode_PrintStream {
 
@@ -42,13 +48,38 @@ public class XMLWriterTest {
 		}
 
 		@Test
-		void t() {
+		void printsACorrectXMLString_passingASingleXMLNodeWithName() {
+			// Prepare
+			ByteArrayOutputStream os = new ByteArrayOutputStream();
+			PrintStream ps = new PrintStream(os);
+			// Run
+			unitUnderTest.write(createNode("node"), ps);
+			// Check
+			assertEquals("<node></node>", os.toString());
+		}
+
+		@Test
+		void printsACorrectXMLString_passingAComplexXMLNodeWithName() {
+			// Prepare
+			ByteArrayOutputStream os = new ByteArrayOutputStream();
+			PrintStream ps = new PrintStream(os);
+			// Run
 			unitUnderTest
 					.write(
-							new XMLNode()
-									.setName("nodes")
-									.setNodes(List.of(new XMLNode().setName("node"), new XMLNode().setName("node"))),
-							System.out);
+							createNode("root")
+									.setNodes(
+											List
+													.of(
+															createNode("name"),
+															createNode("address")
+																	.setNodes(
+																			List
+																					.of(
+																							createNode("street"),
+																							createNode("city"))))),
+							ps);
+			// Check
+			assertEquals("<root><name></name><address><street></street><city></city></address></root>", os.toString());
 		}
 
 	}
