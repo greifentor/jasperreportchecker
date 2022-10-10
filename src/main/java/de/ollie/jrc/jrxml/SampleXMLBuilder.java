@@ -124,7 +124,7 @@ public class SampleXMLBuilder {
 
 	private String getFileNameFromSubreportExpression(Subreport subreport) {
 		String s = subreport.getSubreportExpression();
-		String subreportDir = ""
+		String subreportDir = "";
 		// process ${SUBREPORT_DIR}
 		// "XMLBuilderChecker-XML-WithSubreport.jasper"
 		return s;
