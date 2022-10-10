@@ -1,5 +1,6 @@
 package de.ollie.jrc;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
@@ -93,6 +94,24 @@ class JRCTest {
 		JRC.main(new String[] { "check", "-f", fileName, "-snfm" });
 		System.out.println("\"" + baos.toString() + "\"");
 		assertTrue(baos.toString().isEmpty());
+	}
+
+	@Test
+	void passParametersForAXMLCall_printsTheXML() {
+		String fileName = "src/test/resources/test-report/XMLBuilderChecker-XML-SimpleTest.jrxml";
+		JRC.main(new String[] { "xml", "-f", fileName });
+		assertEquals(
+				"<root><commons><usedField></usedField></commons></root>",
+				baos.toString().replace("\r", "").replace("\n", ""));
+	}
+
+	@Test
+	void passParametersForAXMLCallWithSubreport_rootLinked_printsTheXML() {
+		String fileName = "src/test/resources/test-report/XMLBuilderChecker-XML-WithSubreport.jrxml";
+		JRC.main(new String[] { "xml", "-f", fileName });
+		assertEquals(
+				"<root><commons><usedField></usedField><subreportField></subreportField></commons></root>",
+				baos.toString().replace("\r", "").replace("\n", ""));
 	}
 
 	@Test

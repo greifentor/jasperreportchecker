@@ -20,6 +20,8 @@ import lombok.experimental.Accessors;
 @XmlAccessorType(XmlAccessType.FIELD) // That's vital to use the other annotations.
 public class JasperReport {
 
+	@XmlElement(name = "detail")
+	private List<Detail> details = new ArrayList<>();
 	@XmlElement(name = "field")
 	private List<Field> fields = new ArrayList<>();
 	@XmlElement(name = "parameter")

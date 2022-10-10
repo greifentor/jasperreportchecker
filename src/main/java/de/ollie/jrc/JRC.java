@@ -1,12 +1,20 @@
 package de.ollie.jrc;
 
+import java.io.IOException;
 import java.io.PrintStream;
 import java.util.List;
+
+import javax.xml.bind.JAXBException;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.ParseException;
 
+import de.ollie.jrc.jrxml.FileReader;
+import de.ollie.jrc.jrxml.SampleXMLBuilder;
 import de.ollie.jrc.jrxml.UnusedObjectChecker;
+import de.ollie.jrc.jrxml.XMLWriter;
+import de.ollie.jrc.jrxml.model.JasperReport;
+import de.ollie.jrc.xml.model.XMLNode;
 
 public class JRC {
 
@@ -51,11 +59,17 @@ public class JRC {
 						.reduce((b0, b1) -> b0 || b1)
 						.orElse(true);
 			} else if ("xml".equalsIgnoreCase(args[0])) {
-
+				JasperReport report = new FileReader(cmd.getOptionValue("f")).readFromFile();
+				XMLNode rootNode = new SampleXMLBuilder().buildXMLFromJasperReport(report);
+				new XMLWriter().write(rootNode, out);
 			}
 			if (somethingPrinted) {
 				out.println();
 			}
+		} catch (IOException ioe) {
+			out.println("JAXBException: " + ioe.getMessage());
+		} catch (JAXBException jaxbe) {
+			out.println("JAXBException: " + jaxbe.getMessage());
 		} catch (ParseException pe) {
 			out.println("ParseException: " + pe.getMessage());
 		} catch (RuntimeException rte) {

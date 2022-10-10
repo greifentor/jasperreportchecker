@@ -7,6 +7,7 @@ import org.apache.commons.lang3.StringUtils;
 
 import de.ollie.jrc.jrxml.model.Field;
 import de.ollie.jrc.jrxml.model.JasperReport;
+import de.ollie.jrc.jrxml.model.Subreport;
 import de.ollie.jrc.util.PathElements;
 import de.ollie.jrc.xml.exception.DifferentRootNamesException;
 import de.ollie.jrc.xml.model.XMLNode;
@@ -24,6 +25,7 @@ public class SampleXMLBuilder {
 		if (hasFieldWithFieldDescription(report)) {
 			XMLNode rootNode = new XMLNode();
 			forEachFieldWithSetFieldDescriptionCallAnXMLNodeAdder(report, rootNode);
+			forEachSubreportCallConversionAgain(report);
 			return rootNode;
 		}
 		return null;
@@ -103,6 +105,29 @@ public class SampleXMLBuilder {
 			}
 		}
 
+	}
+
+	private void forEachSubreportCallConversionAgain(JasperReport report) {
+		report
+				.getDetails()
+				.stream()
+				.flatMap(detail -> detail.getBands().stream())
+				.flatMap(band -> band.getSubreports().stream())
+				.forEach(subreport -> {
+					try {
+					JasperReport r = new FileReader(getFileNameFromSubreportExpression(subreport)).readFromFile();
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+				});
+	}
+
+	private String getFileNameFromSubreportExpression(Subreport subreport) {
+		String s = subreport.getSubreportExpression();
+		String subreportDir = ""
+		// process ${SUBREPORT_DIR}
+		// "XMLBuilderChecker-XML-WithSubreport.jasper"
+		return s;
 	}
 
 }
