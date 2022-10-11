@@ -35,7 +35,7 @@
 			<subreport>
 				<reportElement x="13" y="73" width="486" height="67" uuid="ddf7287d-6db0-487e-bdb0-9a1dfa1e20d7"/>
 				<dataSourceExpression><![CDATA[((net.sf.jasperreports.engine.data.JRXmlDataSource)$P{REPORT_DATA_SOURCE}).dataSource("/")]]></dataSourceExpression>
-				<subreportExpression><![CDATA[$P{SUBREPORT_DIR} + "XMLBuilderChecker-XML-WithSubreport.jasper"]]></subreportExpression>
+				<subreportExpression><![CDATA[$P{SUBREPORT_DIR} + "XMLBuilderChecker-XML-Subreport.jasper"]]></subreportExpression>
 			</subreport>
 		</band>
 	</detail>
