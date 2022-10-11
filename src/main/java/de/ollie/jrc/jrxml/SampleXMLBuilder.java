@@ -14,29 +14,30 @@ import de.ollie.jrc.xml.model.XMLNode;
 
 public class SampleXMLBuilder {
 
-	public XMLNode buildXMLFromJasperReport(JasperReport report) {
+	public XMLNode buildXMLFromJasperReport(JasperReport report, String subreportDirectory) {
 		if (report == null) {
 			return null;
 		}
-		return convertReportToXMLNode(report);
+		return convertReportToXMLNode(report, subreportDirectory);
 	}
 
-	private XMLNode convertReportToXMLNode(JasperReport report) {
-		if (hasFieldWithFieldDescription(report)) {
+	private XMLNode convertReportToXMLNode(JasperReport report, String subreportDirectory) {
+		// if (hasFieldWithFieldDescription(report)) {
 			XMLNode rootNode = new XMLNode();
-			forEachFieldWithSetFieldDescriptionCallAnXMLNodeAdder(report, rootNode);
-			forEachSubreportCallConversionAgain(report);
+			forEachFieldWithSetFieldDescriptionCallAnXMLNodeAdder(report, rootNode, "");
+			forEachSubreportCallConversionAgain(report, subreportDirectory, rootNode);
 			return rootNode;
-		}
-		return null;
+			// }
+			// return null;
 	}
 
-	private void forEachFieldWithSetFieldDescriptionCallAnXMLNodeAdder(JasperReport report, XMLNode xmlNode) {
+	private void forEachFieldWithSetFieldDescriptionCallAnXMLNodeAdder(JasperReport report, XMLNode xmlNode,
+			String descriptionPrefix) {
 		report
 				.getFields()
 				.stream()
 				.filter(this::isFieldDescriptionSet)
-				.forEach(field -> new XMLNodeAdder(field, xmlNode).addFieldAsXMLNode());
+				.forEach(field -> new XMLNodeAdder(field, xmlNode, descriptionPrefix).addFieldAsXMLNode());
 	}
 
 	private boolean hasFieldWithFieldDescription(JasperReport report) {
@@ -49,11 +50,13 @@ public class SampleXMLBuilder {
 
 	private class XMLNodeAdder {
 
+		private String descriptionPrefix;
 		private Field field;
 		private PathElements pathElements;
 		private XMLNode xmlNode;
 
-		private XMLNodeAdder(Field field, XMLNode xmlNode) {
+		private XMLNodeAdder(Field field, XMLNode xmlNode, String descriptionPrefix) {
+			this.descriptionPrefix = descriptionPrefix;
 			this.field = field;
 			this.xmlNode = xmlNode;
 		}
@@ -70,7 +73,9 @@ public class SampleXMLBuilder {
 
 		private void splitFieldDescriptionBySlashesToPathElements() {
 			pathElements =
-					new PathElements(new ArrayList<>(List.of(StringUtils.split(field.getFieldDescription(), "/"))));
+					new PathElements(
+							new ArrayList<>(
+									List.of(StringUtils.split(descriptionPrefix + field.getFieldDescription(), "/"))));
 		}
 
 		private void setNameForXMLNodeFromFirstPathElement() {
@@ -79,7 +84,8 @@ public class SampleXMLBuilder {
 				xmlNode.setName(name);
 			} else if (!xmlNode.getName().equals(name)) {
 				throw new DifferentRootNamesException(
-						"field description '" + field.getFieldDescription()
+						"field description '" + descriptionPrefix
+								+ field.getFieldDescription()
 								+ "' should start with:"
 								+ xmlNode.getName());
 			}
@@ -107,7 +113,7 @@ public class SampleXMLBuilder {
 
 	}
 
-	private void forEachSubreportCallConversionAgain(JasperReport report) {
+	private void forEachSubreportCallConversionAgain(JasperReport report, String subreportDirectory, XMLNode rootNode) {
 		report
 				.getDetails()
 				.stream()
@@ -115,19 +121,38 @@ public class SampleXMLBuilder {
 				.flatMap(band -> band.getSubreports().stream())
 				.forEach(subreport -> {
 					try {
-					JasperReport r = new FileReader(getFileNameFromSubreportExpression(subreport)).readFromFile();
+						JasperReport r =
+								new FileReader(getFileNameFromSubreportExpression(subreport, subreportDirectory))
+										.readFromFile();
+						forEachFieldWithSetFieldDescriptionCallAnXMLNodeAdder(
+								r,
+								rootNode,
+								getDescriptionPrefix(subreport));
+						forEachSubreportCallConversionAgain(r, subreportDirectory, rootNode);
 					} catch (Exception e) {
 						e.printStackTrace();
 					}
 				});
 	}
 
-	private String getFileNameFromSubreportExpression(Subreport subreport) {
-		String s = subreport.getSubreportExpression();
-		String subreportDir = "";
-		// process ${SUBREPORT_DIR}
-		// "XMLBuilderChecker-XML-WithSubreport.jasper"
-		return s;
+	private String getFileNameFromSubreportExpression(Subreport subreport, String subreportDirectory) {
+		return subreport
+				.getSubreportExpression()
+				.replace(" ", "")
+				.replace("$P{SUBREPORT_DIR}+\"", subreportDirectory + (!subreportDirectory.endsWith("/") ? "/" : ""))
+				.replace(".jasper\"", ".jrxml")
+				.replace("\\", "/");
+	}
+
+	private String getDescriptionPrefix(Subreport subreport) {
+		return subreport
+				.getDataSourceExpression()
+				.replace("new net.sf.jasperreports.engine.JREmptyDataSource()", "")
+				.replace(
+						"((net.sf.jasperreports.engine.data.JRXmlDataSource)$P{REPORT_DATA_SOURCE}).subDataSource(\"",
+						"")
+				.replace("((net.sf.jasperreports.engine.data.JRXmlDataSource)$P{REPORT_DATA_SOURCE}).dataSource(\"", "")
+				.replace("\")", "");
 	}
 
 }

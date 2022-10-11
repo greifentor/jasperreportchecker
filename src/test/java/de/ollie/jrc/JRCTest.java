@@ -106,9 +106,9 @@ class JRCTest {
 	}
 
 	@Test
-	void passParametersForAXMLCallWithSubreport_rootLinked_printsTheXML() {
+	void passParametersForAXMLCallWithSubreport_datasourceRootPassed_printsTheXML() {
 		String fileName = "src/test/resources/test-report/XMLBuilderChecker-XML-WithSubreport.jrxml";
-		JRC.main(new String[] { "xml", "-f", fileName });
+		JRC.main(new String[] { "xml", "-f", fileName, "-sd", "src/test/resources/test-report/" });
 		assertEquals(
 				"<root><commons><usedField></usedField><subreportField></subreportField></commons></root>",
 				baos.toString().replace("\r", "").replace("\n", ""));

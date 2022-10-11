@@ -47,6 +47,7 @@ public class JRC {
 				out.println("    - creates sample xml templates for a JRXML file.");
 				out.println("    - parameters:");
 				out.println("        -f FILE_NAME (the name of the JRXML file which the sample is to create for)");
+				out.println("        -sd DIR_NAME (the name of a directory, where the subreports could be found)");
 				// out.println(" -o FILE_NAME (a name for the output file)");
 			} else if ("check".equalsIgnoreCase(args[0])) {
 				List<String> fileNames = FILE_NAME_PROVIDER.getFileNamesFromCommandLineParameters(cmd);
@@ -60,16 +61,22 @@ public class JRC {
 						.orElse(true);
 			} else if ("xml".equalsIgnoreCase(args[0])) {
 				JasperReport report = new FileReader(cmd.getOptionValue("f")).readFromFile();
-				XMLNode rootNode = new SampleXMLBuilder().buildXMLFromJasperReport(report);
+				String subreportDir = cmd.getOptionValue("sd");
+				if ((subreportDir == null) || subreportDir.isEmpty()) {
+					subreportDir = "./";
+				}
+				XMLNode rootNode = new SampleXMLBuilder().buildXMLFromJasperReport(report, subreportDir);
 				new XMLWriter().write(rootNode, out);
 			}
 			if (somethingPrinted) {
 				out.println();
 			}
 		} catch (IOException ioe) {
-			out.println("JAXBException: " + ioe.getMessage());
+			out.println("IOException: " + ioe.getMessage());
+			ioe.printStackTrace();
 		} catch (JAXBException jaxbe) {
 			out.println("JAXBException: " + jaxbe.getMessage());
+			jaxbe.printStackTrace();
 		} catch (ParseException pe) {
 			out.println("ParseException: " + pe.getMessage());
 		} catch (RuntimeException rte) {
