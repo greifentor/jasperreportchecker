@@ -145,7 +145,7 @@ public class SampleXMLBuilder {
 	}
 
 	private String getDescriptionPrefix(Subreport subreport) {
-		return subreport
+		String s = subreport
 				.getDataSourceExpression()
 				.replace("new net.sf.jasperreports.engine.JREmptyDataSource()", "")
 				.replace(
@@ -153,6 +153,7 @@ public class SampleXMLBuilder {
 						"")
 				.replace("((net.sf.jasperreports.engine.data.JRXmlDataSource)$P{REPORT_DATA_SOURCE}).dataSource(\"", "")
 				.replace("\")", "");
+		return s + (!s.endsWith("/") ? "/" : "");
 	}
 
 }
