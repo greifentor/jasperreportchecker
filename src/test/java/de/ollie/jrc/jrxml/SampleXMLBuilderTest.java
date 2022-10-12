@@ -4,8 +4,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
+import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -21,6 +21,7 @@ import de.ollie.jrc.xml.model.XMLNode;
 @ExtendWith(MockitoExtension.class)
 public class SampleXMLBuilderTest {
 
+	private static final String CLASS_NAME = "class.Name";
 	private static final String SUBREPORT_DIR = "subreport/dir";
 
 	@InjectMocks
@@ -31,7 +32,11 @@ public class SampleXMLBuilderTest {
 	}
 
 	private List<Field> createFields(String... fieldDescriptions) {
-		return List.of(fieldDescriptions).stream().map(s -> createField(s)).collect(Collectors.toList());
+		List<Field> fields = new ArrayList<>();
+		for (int i = 0, leni = fieldDescriptions.length; i < leni; i = i + 2) {
+			fields.add(new Field().setName(fieldDescriptions[i]).setCls(fieldDescriptions[i + 1]));
+		}
+		return fields;
 	}
 
 	private XMLNode createXMLNode(String name) {
@@ -93,7 +98,8 @@ public class SampleXMLBuilderTest {
 					new XMLNode().setName("root").setNodes(List.of(createXMLNode("field0"), createXMLNode("field1"))),
 					unitUnderTest
 							.buildXMLFromJasperReport(
-									new JasperReport().setFields(createFields("/root/field0", "/root/field1")),
+									new JasperReport()
+											.setFields(createFields("/root/field0", null, "/root/field1", null)),
 									SUBREPORT_DIR));
 		}
 
@@ -117,9 +123,13 @@ public class SampleXMLBuilderTest {
 											.setFields(
 													createFields(
 															"/root/field0",
+															null,
 															"/root/field1",
+															null,
 															"/root/others/other0",
-															"/root/others/other1")),
+															null,
+															"/root/others/other1",
+															null)),
 									SUBREPORT_DIR));
 		}
 
@@ -134,7 +144,12 @@ public class SampleXMLBuilderTest {
 					() -> unitUnderTest
 							.buildXMLFromJasperReport(
 									new JasperReport()
-											.setFields(createFields("/" + root0 + "/field0", fieldDescription1)),
+											.setFields(
+													createFields(
+															"/" + root0 + "/field0",
+															null,
+															fieldDescription1,
+															null)),
 									SUBREPORT_DIR));
 			assertEquals("field description '" + fieldDescription1 + "' should start with:" + root0, e.getMessage());
 		}
@@ -146,12 +161,17 @@ public class SampleXMLBuilderTest {
 							"one",
 							createXMLNode(
 									"two",
-									createXMLNode("three", createXMLNode("four")),
-									createXMLNode("threeAndAHalf"))),
+									createXMLNode("three", createXMLNode("four").setClassName(CLASS_NAME)),
+									createXMLNode("threeAndAHalf").setClassName(CLASS_NAME))),
 					unitUnderTest
 							.buildXMLFromJasperReport(
 									new JasperReport()
-											.setFields(createFields("/one/two/three/four", "/one/two/threeAndAHalf")),
+											.setFields(
+													createFields(
+															"/one/two/three/four",
+															CLASS_NAME,
+															"/one/two/threeAndAHalf",
+															CLASS_NAME)),
 									SUBREPORT_DIR));
 		}
 

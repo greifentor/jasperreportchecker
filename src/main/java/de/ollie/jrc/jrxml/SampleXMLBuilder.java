@@ -36,26 +36,19 @@ public class SampleXMLBuilder {
 		report
 				.getFields()
 				.stream()
-				// .filter(this::isFieldDescriptionSet)
 				.forEach(field -> new XMLNodeAdder(field, xmlNode, descriptionPrefix).addFieldAsXMLNode());
-	}
-
-	private boolean hasFieldWithFieldDescription(JasperReport report) {
-		return report.getFields().stream().anyMatch(this::isFieldDescriptionSet);
-	}
-
-	private boolean isFieldDescriptionSet(Field field) {
-		return (field.getFieldDescription() != null) && !field.getFieldDescription().isBlank();
 	}
 
 	private class XMLNodeAdder {
 
+		private String className;
 		private String descriptionPrefix;
 		private String fieldPath;
 		private PathElements pathElements;
 		private XMLNode xmlNode;
 
 		private XMLNodeAdder(Field field, XMLNode xmlNode, String descriptionPrefix) {
+			this.className = field.getCls();
 			this.descriptionPrefix = descriptionPrefix;
 			this.fieldPath = (field.getFieldDescription() != null) && !field.getFieldDescription().isEmpty()
 					? field.getFieldDescription()
@@ -71,6 +64,7 @@ public class SampleXMLBuilder {
 				findOrCreateNodeForFirstPathElementAndAddToCurrentNode();
 				removeFirstPathElement();
 			}
+			addClassNameToLastNode();
 		}
 
 		private void splitFieldDescriptionBySlashesToPathElements() {
@@ -109,6 +103,10 @@ public class SampleXMLBuilder {
 			} else {
 				xmlNode = matchingNodes.get(0);
 			}
+		}
+
+		private void addClassNameToLastNode() {
+			xmlNode.setClassName(className);
 		}
 
 	}
