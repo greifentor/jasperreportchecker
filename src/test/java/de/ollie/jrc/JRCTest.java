@@ -119,7 +119,7 @@ class JRCTest {
 		String fileName = "src/test/resources/test-reports/XMLBuilderChecker-XML-WithSubreport-OwnPathPassed.jrxml";
 		JRC.main(new String[] { "xml", "-f", fileName, "-sd", "src/test/resources/test-reports/" });
 		assertEquals(
-				"<root><commons><usedField></usedField><sub><path><subreportField></subreportField></path></sub></commons></root>",
+				"<root><commons><usedField></usedField><subreport><subreportField0></subreportField0><sub><path><subreportField1></subreportField1></path></sub></subreport></commons></root>",
 				baos.toString().replace("\r", "").replace("\n", ""));
 	}
 

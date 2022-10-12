@@ -56,22 +56,24 @@ public class SampleXMLBuilderTest {
 		}
 
 		@Test
-		void returnsANullValue_passingAJasperReportWithAFieldWithFieldDescriptionNull() {
+		void returnsFieldName_passingAJasperReportWithAFieldWithFieldDescriptionNull() {
+			String name = "name";
 			assertEquals(
-					new XMLNode(),
+					new XMLNode().setName(name),
 					unitUnderTest
 							.buildXMLFromJasperReport(
-									new JasperReport().setFields(List.of(new Field())),
+									new JasperReport().setFields(List.of(new Field().setName(name))),
 									SUBREPORT_DIR));
 		}
 
 		@Test
 		void returnsANullPointer_passingAJasperReportWithAFieldWithFieldDescriptionEmpty() {
+			String name = "name";
 			assertEquals(
-					new XMLNode(),
+					new XMLNode().setName(name),
 					unitUnderTest
 							.buildXMLFromJasperReport(
-									new JasperReport().setFields(List.of(createField(""))),
+									new JasperReport().setFields(List.of(createField("").setName(name))),
 									SUBREPORT_DIR));
 		}
 

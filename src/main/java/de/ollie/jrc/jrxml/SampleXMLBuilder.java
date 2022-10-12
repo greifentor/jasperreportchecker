@@ -23,12 +23,12 @@ public class SampleXMLBuilder {
 
 	private XMLNode convertReportToXMLNode(JasperReport report, String subreportDirectory) {
 		// if (hasFieldWithFieldDescription(report)) {
-			XMLNode rootNode = new XMLNode();
-			forEachFieldWithSetFieldDescriptionCallAnXMLNodeAdder(report, rootNode, "");
-			forEachSubreportCallConversionAgain(report, subreportDirectory, rootNode);
-			return rootNode;
-			// }
-			// return null;
+		XMLNode rootNode = new XMLNode();
+		forEachFieldWithSetFieldDescriptionCallAnXMLNodeAdder(report, rootNode, "");
+		forEachSubreportCallConversionAgain(report, subreportDirectory, rootNode);
+		return rootNode;
+		// }
+		// return null;
 	}
 
 	private void forEachFieldWithSetFieldDescriptionCallAnXMLNodeAdder(JasperReport report, XMLNode xmlNode,
@@ -36,7 +36,7 @@ public class SampleXMLBuilder {
 		report
 				.getFields()
 				.stream()
-				.filter(this::isFieldDescriptionSet)
+				// .filter(this::isFieldDescriptionSet)
 				.forEach(field -> new XMLNodeAdder(field, xmlNode, descriptionPrefix).addFieldAsXMLNode());
 	}
 
@@ -51,13 +51,15 @@ public class SampleXMLBuilder {
 	private class XMLNodeAdder {
 
 		private String descriptionPrefix;
-		private Field field;
+		private String fieldPath;
 		private PathElements pathElements;
 		private XMLNode xmlNode;
 
 		private XMLNodeAdder(Field field, XMLNode xmlNode, String descriptionPrefix) {
 			this.descriptionPrefix = descriptionPrefix;
-			this.field = field;
+			this.fieldPath = (field.getFieldDescription() != null) && !field.getFieldDescription().isEmpty()
+					? field.getFieldDescription()
+					: field.getName();
 			this.xmlNode = xmlNode;
 		}
 
@@ -73,9 +75,7 @@ public class SampleXMLBuilder {
 
 		private void splitFieldDescriptionBySlashesToPathElements() {
 			pathElements =
-					new PathElements(
-							new ArrayList<>(
-									List.of(StringUtils.split(descriptionPrefix + field.getFieldDescription(), "/"))));
+					new PathElements(new ArrayList<>(List.of(StringUtils.split(descriptionPrefix + fieldPath, "/"))));
 		}
 
 		private void setNameForXMLNodeFromFirstPathElement() {
@@ -85,7 +85,7 @@ public class SampleXMLBuilder {
 			} else if (!xmlNode.getName().equals(name)) {
 				throw new DifferentRootNamesException(
 						"field description '" + descriptionPrefix
-								+ field.getFieldDescription()
+								+ fieldPath
 								+ "' should start with:"
 								+ xmlNode.getName());
 			}
@@ -121,6 +121,10 @@ public class SampleXMLBuilder {
 				.flatMap(band -> band.getSubreports().stream())
 				.forEach(subreport -> {
 					try {
+						System.out
+								.println(
+										"processing subreport: "
+												+ getFileNameFromSubreportExpression(subreport, subreportDirectory));
 						JasperReport r =
 								new FileReader(getFileNameFromSubreportExpression(subreport, subreportDirectory))
 										.readFromFile();

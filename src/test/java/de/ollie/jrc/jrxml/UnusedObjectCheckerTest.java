@@ -11,7 +11,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 @ExtendWith(MockitoExtension.class)
 class UnusedObjectCheckerTest {
 	
-	private static final String JRXML_FILE_NAME = "src/test/resources/test-report/UnusedObjectChecker-FieldsParametersAndVariables.jrxml";
+	private static final String JRXML_FILE_NAME =
+			"src/test/resources/test-reports/UnusedObjectChecker-FieldsParametersAndVariables.jrxml";
 	
 	@InjectMocks
 	private UnusedObjectChecker unitUnderTest;
