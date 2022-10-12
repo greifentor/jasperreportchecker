@@ -34,7 +34,7 @@
 			</textField>
 			<subreport>
 				<reportElement x="13" y="73" width="486" height="67" uuid="ddf7287d-6db0-487e-bdb0-9a1dfa1e20d7"/>
-				<dataSourceExpression><![CDATA[((net.sf.jasperreports.engine.data.JRXmlDataSource)$P{REPORT_DATA_SOURCE}).dataSource("/root/commons")]]></dataSourceExpression>
+				<dataSourceExpression><![CDATA[((net.sf.jasperreports.engine.data.JRXmlDataSource)$P{REPORT_DATA_SOURCE}).dataSource("/root/commons/subreport")]]></dataSourceExpression>
 				<subreportExpression><![CDATA[$P{SUBREPORT_DIR} + "XMLBuilderChecker-XML-Subreport-WithOwnPath.jasper"]]></subreportExpression>
 			</subreport>
 		</band>
