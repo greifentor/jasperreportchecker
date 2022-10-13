@@ -2,6 +2,7 @@ package de.ollie.jrc.jrxml;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Logger;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -14,6 +15,8 @@ import de.ollie.jrc.xml.model.XMLNode;
 
 public class SampleXMLBuilder {
 
+	private static final Logger LOGGER = Logger.getLogger("SampleXMLBuilder");
+
 	public XMLNode buildXMLFromJasperReport(JasperReport report, String subreportDirectory) {
 		if (report == null) {
 			return null;
@@ -22,13 +25,10 @@ public class SampleXMLBuilder {
 	}
 
 	private XMLNode convertReportToXMLNode(JasperReport report, String subreportDirectory) {
-		// if (hasFieldWithFieldDescription(report)) {
 		XMLNode rootNode = new XMLNode();
 		forEachFieldWithSetFieldDescriptionCallAnXMLNodeAdder(report, rootNode, "");
 		forEachSubreportCallConversionAgain(report, subreportDirectory, rootNode);
 		return rootNode;
-		// }
-		// return null;
 	}
 
 	private void forEachFieldWithSetFieldDescriptionCallAnXMLNodeAdder(JasperReport report, XMLNode xmlNode,
@@ -119,8 +119,8 @@ public class SampleXMLBuilder {
 				.flatMap(band -> band.getSubreports().stream())
 				.forEach(subreport -> {
 					try {
-						System.out
-								.println(
+						LOGGER
+								.info(
 										"processing subreport: "
 												+ getFileNameFromSubreportExpression(subreport, subreportDirectory));
 						JasperReport r =

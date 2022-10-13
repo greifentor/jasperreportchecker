@@ -10,6 +10,7 @@ import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.ParseException;
 
 import de.ollie.jrc.jrxml.FileReader;
+import de.ollie.jrc.jrxml.NodeSampleDataGenerator;
 import de.ollie.jrc.jrxml.SampleXMLBuilder;
 import de.ollie.jrc.jrxml.UnusedObjectChecker;
 import de.ollie.jrc.jrxml.XMLWriter;
@@ -21,6 +22,7 @@ public class JRC {
 	static PrintStream out = System.out;
 
 	private static final FileNameProvider FILE_NAME_PROVIDER = new FileNameProvider();
+	private static final NodeSampleDataGenerator NODE_SAMPLE_DATA_GENERATOR = new NodeSampleDataGenerator();
 	private static final UnusedObjectChecker UNUSED_OBJECT_CHECKER = new UnusedObjectChecker();
 
 	JRC() {
@@ -66,7 +68,7 @@ public class JRC {
 					subreportDir = "./";
 				}
 				XMLNode rootNode = new SampleXMLBuilder().buildXMLFromJasperReport(report, subreportDir);
-				new XMLWriter().write(rootNode, out);
+				new XMLWriter(NODE_SAMPLE_DATA_GENERATOR).write(rootNode, out);
 			}
 			if (somethingPrinted) {
 				out.println();
