@@ -138,12 +138,7 @@ public class SampleXMLBuilder {
 	}
 
 	private String getFileNameFromSubreportExpression(Subreport subreport, String subreportDirectory) {
-		return subreport
-				.getSubreportExpression()
-				.replace(" ", "")
-				.replace("$P{SUBREPORT_DIR}+\"", subreportDirectory + (!subreportDirectory.endsWith("/") ? "/" : ""))
-				.replace(".jasper\"", ".jrxml")
-				.replace("\\", "/");
+		return subreport.getCalledFileName(subreportDirectory);
 	}
 
 	private String getDescriptionPrefix(Subreport subreport) {

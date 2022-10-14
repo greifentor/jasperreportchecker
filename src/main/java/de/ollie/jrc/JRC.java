@@ -3,15 +3,19 @@ package de.ollie.jrc;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.util.List;
+import java.util.Map;
 
 import javax.xml.bind.JAXBException;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.ParseException;
 
+import de.ollie.jrc.jrxml.DependencyDiagramBuilder;
+import de.ollie.jrc.jrxml.DirectoryReader;
 import de.ollie.jrc.jrxml.FileReader;
 import de.ollie.jrc.jrxml.NodeSampleDataGenerator;
 import de.ollie.jrc.jrxml.SampleXMLBuilder;
+import de.ollie.jrc.jrxml.TopUsageReportListBuilder;
 import de.ollie.jrc.jrxml.UnusedObjectChecker;
 import de.ollie.jrc.jrxml.XMLWriter;
 import de.ollie.jrc.jrxml.model.JasperReport;
@@ -45,6 +49,14 @@ public class JRC {
 				out.println("        -f FILE_NAME[,FILE_NAME]");
 				out.println("        -p PATTERN_TO_SEARCH_FOR (e. g. \"*.jrxml\")");
 				out.println("        -snfm (suppresses messages if nothing unused found)");
+				out.println("\n  usage");
+				out.println("    - create a PlantUML diagram with the reports dependent to the passed one");
+				out.println("    - parameters:");
+				out
+						.println(
+								"        -f FILE_NAME (the name of the JRXML file which dependent report to investigate for)");
+				out.println("        -d DIR_NAME (the name of a directory, where the reports could be found)");
+				out.println("        -l (print a list of the top reports only)");
 				out.println("\n  xml");
 				out.println("    - creates sample xml templates for a JRXML file.");
 				out.println("    - parameters:");
@@ -61,8 +73,23 @@ public class JRC {
 						.map(fileName -> checkForFile(fileName, cmd.hasOption("snfm")))
 						.reduce((b0, b1) -> b0 || b1)
 						.orElse(true);
+			} else if ("usage".equalsIgnoreCase(args[0])) {
+				String dir = cmd.getOptionValue("d");
+				if ((dir == null) || dir.isEmpty()) {
+					dir = "./";
+				}
+				Map<String, JasperReport> reports = new DirectoryReader(dir).readAllReports();
+				if (cmd.hasOption("l")) {
+					new TopUsageReportListBuilder(cmd.getOptionValue("f").replace(dir, ""), reports, out).build();
+				} else {
+					new DependencyDiagramBuilder(cmd.getOptionValue("f").replace(dir, ""), reports, out).build();
+				}
 			} else if ("xml".equalsIgnoreCase(args[0])) {
 				JasperReport report = new FileReader(cmd.getOptionValue("f")).readFromFile();
+				String dir = cmd.getOptionValue("d");
+				if ((dir == null) || dir.isEmpty()) {
+					dir = "./";
+				}
 				String subreportDir = cmd.getOptionValue("sd");
 				if ((subreportDir == null) || subreportDir.isEmpty()) {
 					subreportDir = "./";

@@ -15,6 +15,7 @@ public class CommandLineParser {
 		options.addOption("o", true, "a name for the output file.");
 		options.addOption("p", true, "file pattern for search in a directory.");
 		options.addOption("snfm", false, "suppresses any message for file which doesn't contain any unused fields.");
+		options.addOption("l", false, "switches to list output.");
 		return new DefaultParser().parse(options, args);
 	}
 

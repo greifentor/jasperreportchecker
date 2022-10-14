@@ -143,6 +143,53 @@ class JRCTest {
 
 	}
 
+	@Nested
+	class TestsOfCommand_usage {
+
+		@Test
+		void returnsASimpleDiagramString_passingParametersForAnUnusedFile() {
+			String fileName =
+					"src/test/resources/test-reports/usage-test/subsubreports/SubreportUsageCommand-SubSubreport.jrxml";
+			JRC
+					.main(
+							new String[] {
+									"usage",
+									"-f",
+									fileName,
+									"-d",
+									"src/test/resources/test-reports/usage-test/subsubreports" });
+			assertEquals(
+					"@startuml[SubreportUsageCommand-SubSubreport.jrxml]@enduml",
+					baos.toString().replace("\r", "").replace("\n", ""));
+		}
+
+		@Test
+		void returnsAMediumDiagramString_passingParametersForAnUsedFile() {
+			String fileName =
+					"src/test/resources/test-reports/usage-test/subreports/SubreportUsageCommand-Subreport01.jrxml";
+			JRC.main(new String[] { "usage", "-f", fileName, "-d", "src/test/resources/test-reports/usage-test" });
+			assertEquals("@startuml" + //
+					"[subreports/SubreportUsageCommand-Subreport01.jrxml]"
+					+ "[subreports/SubreportUsageCommand-Subreport01.jrxml] <-- [SubreportUsageCommand-Main01.jrxml]"
+					+ "@enduml", baos.toString().replace("\r", "").replace("\n", ""));
+		}
+
+		@Test
+		void returnsAComplexDiagramString_passingParametersForAnUsedFile() {
+			String fileName =
+					"src/test/resources/test-reports/usage-test/subsubreports/SubreportUsageCommand-SubSubreport.jrxml";
+			JRC.main(new String[] { "usage", "-f", fileName, "-d", "src/test/resources/test-reports/usage-test" });
+			assertEquals(
+					"@startuml" + "[subsubreports/SubreportUsageCommand-SubSubreport.jrxml]"
+							+ "[subsubreports/SubreportUsageCommand-SubSubreport.jrxml] <-- [subreports/SubreportUsageCommand-Subreport01.jrxml]"
+							+ "[subreports/SubreportUsageCommand-Subreport01.jrxml] <-- [SubreportUsageCommand-Main01.jrxml]"
+							+ "[subsubreports/SubreportUsageCommand-SubSubreport.jrxml] <-- [subreports/SubreportUsageCommand-Subreport02.jrxml]"
+							+ "@enduml",
+					baos.toString().replace("\r", "").replace("\n", ""));
+		}
+
+	}
+
 	@Test
 	void test() {
 		String dir =
