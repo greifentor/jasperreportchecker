@@ -53,3 +53,8 @@ Instead of using the Powershell start the application via the simple (old) windo
 ```
 java -jar target\jasperreportscleaner-1.0.0.jar check -d C:\workspace\document-project\ -p "*.jrxml"
 ```
+
+### GUI
+
+This command (```gui```) starts the application with a Swing GUI which allows to selected files for a check in a
+comfortable way.

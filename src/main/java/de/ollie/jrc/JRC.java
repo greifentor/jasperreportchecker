@@ -6,6 +6,7 @@ import java.util.List;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.ParseException;
 
+import de.ollie.jrc.gui.JRCFrame;
 import de.ollie.jrc.jrxml.UnusedObjectChecker;
 
 public class JRC {
@@ -35,6 +36,10 @@ public class JRC {
 				out.println("        -f FILE_NAME[,FILE_NAME]");
 				out.println("        -p PATTERN_TO_SEARCH_FOR (e. g. \"*.jrxml\")");
 				out.println("        -snfm (suppresses messages if nothing unused found)");
+				out.println("\n  gui");
+				out.println("    - opens a Swing GUI.");
+				out.println("    - parameters:");
+				out.println("        -d DIR_NAME (a directory to start with (default: \".\")");
 				out.println("\n  xml");
 				out.println("    - creates sample xml templates for a JRXML file.");
 				out.println("    - parameters:");
@@ -50,6 +55,9 @@ public class JRC {
 						.map(fileName -> checkForFile(fileName, cmd.hasOption("snfm")))
 						.reduce((b0, b1) -> b0 || b1)
 						.orElse(true);
+			} else if ("gui".equalsIgnoreCase(args[0])) {
+				String dirName = cmd.hasOption("d") ? cmd.getOptionValue("d") : ".";
+				new JRCFrame(dirName).setVisible(true);
 			} else if ("xml".equalsIgnoreCase(args[0])) {
 
 			}
@@ -63,7 +71,7 @@ public class JRC {
 		}
 	}
 
-	private static boolean checkForFile(String jrxmlFileName, boolean suppressNothingFoundMessage) {
+	public static boolean checkForFile(String jrxmlFileName, boolean suppressNothingFoundMessage) {
 		List<String> messages = UNUSED_OBJECT_CHECKER.checkForUnusedFieldsParametersAndVariables(jrxmlFileName);
 		boolean suppressMessages = isMessageToSuppress(messages, suppressNothingFoundMessage);
 		boolean somethingPrinted = false;
