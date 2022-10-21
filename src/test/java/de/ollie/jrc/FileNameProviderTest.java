@@ -60,7 +60,7 @@ class FileNameProviderTest {
 	void returnsAListWithTheFourFileNames_passingDirectoryAndPattern() throws Exception {
 		CommandLine cmd = new CommandLineParser()
 				.parse(new String[] { "-d", "src/test/resources/test-reports/", "-p", "*.jrxml" });
-		assertEquals(9, unitUnderTest.getFileNamesFromCommandLineParameters(cmd).size());
+		assertEquals(13, unitUnderTest.getFileNamesFromCommandLineParameters(cmd).size());
 		for (String fileName : unitUnderTest.getFileNamesFromCommandLineParameters(cmd)) {
 			assertTrue(fileName.toLowerCase().endsWith(".jrxml"));
 		}

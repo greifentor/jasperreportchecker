@@ -7,7 +7,7 @@ public class NodeSampleDataGenerator {
 	static final String BOOLEAN_CLASS_NAME = "java.util.Boolean";
 	static final String STRING_CLASS_NAME = "java.util.String";
 
-	static final String UNKNOWN = "!!!UNKNOWN!!!";
+	public static final String UNKNOWN = "!!!UNKNOWN!!!";
 
 	public Object getSampleDateFor(XMLNode node) {
 		if (BOOLEAN_CLASS_NAME.equals(node.getClassName())) {
