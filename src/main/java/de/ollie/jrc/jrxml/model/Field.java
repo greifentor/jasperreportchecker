@@ -14,6 +14,8 @@ import lombok.experimental.Accessors;
 @XmlAccessorType(XmlAccessType.FIELD)
 public class Field {
 
+	@XmlAttribute(name = "class")
+	private String cls;
 	@XmlAttribute
 	private String name;
 

@@ -13,6 +13,7 @@ import lombok.experimental.Accessors;
 @Generated
 public class XMLNode {
 
+	private String className;
 	private String name;
 	private List<XMLNode> nodes = new ArrayList<>();
 

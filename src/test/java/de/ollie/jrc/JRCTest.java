@@ -1,5 +1,6 @@
 package de.ollie.jrc;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
@@ -13,7 +14,7 @@ import org.junit.jupiter.api.Test;
 class JRCTest {
 
 	private static final String XML_FILE_NAME =
-			"src/test/resources/test-report/UnusedObjectChecker-FieldsParametersAndVariables.jrxml";
+			"src/test/resources/test-reports/UnusedObjectChecker-FieldsParametersAndVariables.jrxml";
 
 	private ByteArrayOutputStream baos = new ByteArrayOutputStream();
 
@@ -79,7 +80,7 @@ class JRCTest {
 
 	@Test
 	void passFileWithNoUnusedObject_printsAMessage() {
-		String fileName = "src/test/resources/test-report/UnusedObjectChecker-NoUnused.jrxml";
+		String fileName = "src/test/resources/test-reports/UnusedObjectChecker-NoUnused.jrxml";
 		JRC.main(new String[] { "check", "-f", fileName });
 		assertTrue(
 				baos
@@ -89,10 +90,37 @@ class JRCTest {
 
 	@Test
 	void passFileWithNoUnusedObjectAndSuppressNothingFoundMessage_printsNothing() {
-		String fileName = "src/test/resources/test-report/UnusedObjectChecker-NoUnused.jrxml";
+		String fileName = "src/test/resources/test-reports/UnusedObjectChecker-NoUnused.jrxml";
 		JRC.main(new String[] { "check", "-f", fileName, "-snfm" });
 		System.out.println("\"" + baos.toString() + "\"");
 		assertTrue(baos.toString().isEmpty());
+	}
+
+	@Test
+	void passParametersForAXMLCall_printsTheXML() {
+		String fileName = "src/test/resources/test-reports/XMLBuilderChecker-XML-SimpleTest.jrxml";
+		JRC.main(new String[] { "xml", "-f", fileName });
+		assertEquals(
+				"<root><commons><usedField></usedField></commons></root>",
+				baos.toString().replace("\r", "").replace("\n", ""));
+	}
+
+	@Test
+	void passParametersForAXMLCallWithSubreport_datasourceRootWithRootXMLPathPassed_printsTheXML() {
+		String fileName = "src/test/resources/test-reports/XMLBuilderChecker-XML-WithSubreport-RootPathPassed.jrxml";
+		JRC.main(new String[] { "xml", "-f", fileName, "-sd", "src/test/resources/test-reports/" });
+		assertEquals(
+				"<root><commons><usedField></usedField><subreportField></subreportField></commons></root>",
+				baos.toString().replace("\r", "").replace("\n", ""));
+	}
+
+	@Test
+	void passParametersForAXMLCallWithSubreport_datasourceOwnWithOwnXMLPathPassed_printsTheXML() {
+		String fileName = "src/test/resources/test-reports/XMLBuilderChecker-XML-WithSubreport-OwnPathPassed.jrxml";
+		JRC.main(new String[] { "xml", "-f", fileName, "-sd", "src/test/resources/test-reports/" });
+		assertEquals(
+				"<root><commons><usedField></usedField><subreport><subreportField0></subreportField0><sub><path><subreportField1></subreportField1></path></sub></subreport></commons></root>",
+				baos.toString().replace("\r", "").replace("\n", ""));
 	}
 
 	@Test
