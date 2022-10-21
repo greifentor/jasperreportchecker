@@ -10,6 +10,7 @@ import javax.xml.bind.JAXBException;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.ParseException;
 
+import de.ollie.jrc.gui.JRCFrame;
 import de.ollie.jrc.jrxml.DependencyDiagramBuilder;
 import de.ollie.jrc.jrxml.DirectoryReader;
 import de.ollie.jrc.jrxml.FileReader;
@@ -49,6 +50,10 @@ public class JRC {
 				out.println("        -f FILE_NAME[,FILE_NAME]");
 				out.println("        -p PATTERN_TO_SEARCH_FOR (e. g. \"*.jrxml\")");
 				out.println("        -snfm (suppresses messages if nothing unused found)");
+				out.println("\n  gui");
+				out.println("    - opens a Swing GUI.");
+				out.println("    - parameters:");
+				out.println("        -d DIR_NAME (a directory to start with (default: \".\")");
 				out.println("\n  usage");
 				out.println("    - create a PlantUML diagram with the reports dependent to the passed one");
 				out.println("    - parameters:");
@@ -73,6 +78,9 @@ public class JRC {
 						.map(fileName -> checkForFile(fileName, cmd.hasOption("snfm")))
 						.reduce((b0, b1) -> b0 || b1)
 						.orElse(true);
+			} else if ("gui".equalsIgnoreCase(args[0])) {
+				String dirName = cmd.hasOption("d") ? cmd.getOptionValue("d") : ".";
+				new JRCFrame(dirName).setVisible(true);
 			} else if ("usage".equalsIgnoreCase(args[0])) {
 				String dir = cmd.getOptionValue("d");
 				if ((dir == null) || dir.isEmpty()) {
@@ -113,7 +121,7 @@ public class JRC {
 		}
 	}
 
-	private static boolean checkForFile(String jrxmlFileName, boolean suppressNothingFoundMessage) {
+	public static boolean checkForFile(String jrxmlFileName, boolean suppressNothingFoundMessage) {
 		List<String> messages = UNUSED_OBJECT_CHECKER.checkForUnusedFieldsParametersAndVariables(jrxmlFileName);
 		boolean suppressMessages = isMessageToSuppress(messages, suppressNothingFoundMessage);
 		boolean somethingPrinted = false;
