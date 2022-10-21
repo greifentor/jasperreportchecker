@@ -17,7 +17,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 @ExtendWith(MockitoExtension.class)
 class FileReaderTest {
 
-	private static final String XML_FILE_NAME = "src/test/resources/test-report/test-report.jrxml";
+	private static final String XML_FILE_NAME = "src/test/resources/test-reports/test-report.jrxml";
 
 	private FileReader unitUnderTest;
 
@@ -65,7 +65,7 @@ class FileReaderTest {
 		void throwsAnExceptionForNoJasperReportFiles() throws Exception {
 			assertThrows(
 					UnmarshalException.class,
-					() -> new FileReader("src/test/resources/test-report/NoJasperReport.jrxml").readFromFile());
+					() -> new FileReader("src/test/resources/test-reports/NoJasperReport.jrxml").readFromFile());
 		}
 
 		@Test

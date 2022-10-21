@@ -13,7 +13,7 @@ import lombok.Generated;
 @Data
 @Generated
 @XmlAccessorType(XmlAccessType.FIELD)
-public class Detail implements BandProvider {
+public class ColumnHeader implements BandProvider {
 
 	@XmlElement(name = "band")
 	private List<Band> bands = new ArrayList<>();
