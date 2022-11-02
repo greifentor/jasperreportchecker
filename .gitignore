@@ -21,3 +21,4 @@
 .metadata
 target/
 /pom.xml.versionsBackup
+/my.plantuml
