@@ -86,14 +86,8 @@ public class JRC {
 				if ((dir == null) || dir.isEmpty()) {
 					dir = "./";
 				}
-				Map<String, JasperReport> reports = new DirectoryReader(dir).readAllReports();
-				if (cmd.hasOption("l")) {
-					new TopUsageReportListBuilder(cmd.getOptionValue("f").replace(dir, ""), reports, out).build();
-				} else {
-					new DependencyDiagramBuilder(cmd.getOptionValue("f").replace(dir, ""), reports, out).build();
-				}
+				usage(cmd.getOptionValue("f"), dir, cmd.hasOption("l"));
 			} else if ("xml".equalsIgnoreCase(args[0])) {
-				JasperReport report = new FileReader(cmd.getOptionValue("f")).readFromFile();
 				String dir = cmd.getOptionValue("d");
 				if ((dir == null) || dir.isEmpty()) {
 					dir = "./";
@@ -102,8 +96,7 @@ public class JRC {
 				if ((subreportDir == null) || subreportDir.isEmpty()) {
 					subreportDir = "./";
 				}
-				XMLNode rootNode = new SampleXMLBuilder().buildXMLFromJasperReport(report, subreportDir);
-				new XMLWriter(NODE_SAMPLE_DATA_GENERATOR).write(rootNode, out);
+				xml(cmd.getOptionValue("f"), subreportDir);
 			}
 			if (somethingPrinted) {
 				out.println();
@@ -142,6 +135,22 @@ public class JRC {
 
 	private static boolean isMessageToSuppress(List<String> messages, boolean suppressNothingFoundMessage) {
 		return messages.isEmpty() && suppressNothingFoundMessage;
+	}
+
+	public static void usage(String fileName, String dir, boolean topLevelList) throws IOException, JAXBException {
+		Map<String, JasperReport> reports = new DirectoryReader(dir).readAllReports();
+		String plainFileName = fileName.replace(dir, "");
+		if (topLevelList) {
+			new TopUsageReportListBuilder(plainFileName, reports, out).build();
+		} else {
+			new DependencyDiagramBuilder(plainFileName, reports, out).build();
+		}
+	}
+
+	public static void xml(String reportFileName, String subreportDir) throws IOException, JAXBException {
+		JasperReport report = new FileReader(reportFileName).readFromFile();
+		XMLNode rootNode = new SampleXMLBuilder().buildXMLFromJasperReport(report, subreportDir);
+		new XMLWriter(NODE_SAMPLE_DATA_GENERATOR).write(rootNode, out);
 	}
 
 }

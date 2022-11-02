@@ -9,15 +9,33 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class Logger {
 
+	public enum LogLevel {
+		ERROR,
+		INFO;
+	}
+
 	private final String name;
 
 	public static Logger getLogger(String name) {
 		return new Logger(name);
 	}
 
+	public void error(String message, Throwable throwable) {
+		writeMessage(LogLevel.ERROR, message);
+		if (throwable != null) {
+			throwable.printStackTrace();
+		}
+	}
+
+	private void writeMessage(LogLevel logLevel, String message) {
+		String time = LocalDateTime.now().format(DateTimeFormatter.ofPattern("YYYY-MM-dd HH:mm:ss.N"));
+		time = (time.length() > 25 ? time.substring(0, 25) : time);
+		String nameCut = (name.length() > 25 ? name.substring(0, 25) : name);
+		System.out.println(String.format("%25s - %40s - %5s - %s", time, nameCut, logLevel.name(), message));
+	}
+
 	public void info(String message) {
-		String time = LocalDateTime.now().format(DateTimeFormatter.ofPattern("YYYY-MM-DD HH:mm:SS.N"));
-		System.out.println(String.format("%20s - %40s - INFO  - %s", time, name, message));
+		writeMessage(LogLevel.INFO, message);
 	}
 
 }
