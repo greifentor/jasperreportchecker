@@ -4,11 +4,12 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import org.apache.commons.cli.CommandLine;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.junit.jupiter.MockitoExtension;
+
+import de.ollie.jrc.CommandLineParser.CommandLineData;
 
 @ExtendWith(MockitoExtension.class)
 class FileNameProviderTest {
@@ -21,45 +22,46 @@ class FileNameProviderTest {
 
 	@Test
 	void returnsAnEmptyList_passingNoArguments() throws Exception {
-		CommandLine cmd = new CommandLineParser().parse(new String[0]);
+		CommandLineData cmd = new CommandLineParser(new String[0]).parse();
 		assertTrue(unitUnderTest.getFileNamesFromCommandLineParameters(cmd).isEmpty());
 	}
 
 	@Test
 	void returnsAnEmptyList_passingNoFileArguments() throws Exception {
-		CommandLine cmd = new CommandLineParser().parse(new String[] { "a string" });
+		CommandLineData cmd = new CommandLineParser(new String[] { "a string" }).parse();
 		assertTrue(unitUnderTest.getFileNamesFromCommandLineParameters(cmd).isEmpty());
 	}
 
 	@Test
 	void returnsAListWithAFileName_passingASingleFileName() throws Exception {
-		CommandLine cmd = new CommandLineParser().parse(new String[] { "-f", FILE_NAME_0 });
+		CommandLineData cmd = new CommandLineParser(new String[] { "-f", FILE_NAME_0 }).parse();
 		assertEquals(1, unitUnderTest.getFileNamesFromCommandLineParameters(cmd).size());
 	}
 
 	@Test
 	void returnsAListWithAFileName_passingThePassedFileName() throws Exception {
-		CommandLine cmd = new CommandLineParser().parse(new String[] { "-f", FILE_NAME_0 });
+		CommandLineData cmd = new CommandLineParser(new String[] { "-f", FILE_NAME_0 }).parse();
 		assertEquals(FILE_NAME_0, unitUnderTest.getFileNamesFromCommandLineParameters(cmd).get(0));
 	}
 
 	@Test
 	void returnsAListWithTheFileNames_passingMoreThanOneFileName() throws Exception {
-		CommandLine cmd = new CommandLineParser().parse(new String[] { "-f", FILE_NAME_0 + "," + FILE_NAME_1 });
+		CommandLineData cmd = new CommandLineParser(new String[] { "-f", FILE_NAME_0 + "," + FILE_NAME_1 }).parse();
 		assertEquals(2, unitUnderTest.getFileNamesFromCommandLineParameters(cmd).size());
 	}
 
 	@Test
 	void returnsAListWithTheTwoFileName_passingTwoFileName() throws Exception {
-		CommandLine cmd = new CommandLineParser().parse(new String[] { "-f", FILE_NAME_0 + "," + FILE_NAME_1 });
+		CommandLineData cmd = new CommandLineParser(new String[] { "-f", FILE_NAME_0 + "," + FILE_NAME_1 }).parse();
 		assertEquals(FILE_NAME_0, unitUnderTest.getFileNamesFromCommandLineParameters(cmd).get(0));
 		assertEquals(FILE_NAME_1, unitUnderTest.getFileNamesFromCommandLineParameters(cmd).get(1));
 	}
 
 	@Test
 	void returnsAListWithTheFourFileNames_passingDirectoryAndPattern() throws Exception {
-		CommandLine cmd = new CommandLineParser()
-				.parse(new String[] { "-d", "src/test/resources/test-reports/", "-p", "*.jrxml" });
+		CommandLineData cmd =
+				new CommandLineParser(new String[] { "-d", "src/test/resources/test-reports/", "-p", "*.jrxml" })
+						.parse();
 		assertEquals(13, unitUnderTest.getFileNamesFromCommandLineParameters(cmd).size());
 		for (String fileName : unitUnderTest.getFileNamesFromCommandLineParameters(cmd)) {
 			assertTrue(fileName.toLowerCase().endsWith(".jrxml"));
@@ -68,7 +70,7 @@ class FileNameProviderTest {
 
 	@Test
 	void returnsAnEmptyListWithFileNames_passingNoDirectoryButPattern() throws Exception {
-		CommandLine cmd = new CommandLineParser().parse(new String[] { "-p", "*.jrxml" });
+		CommandLineData cmd = new CommandLineParser(new String[] { "-p", "*.jrxml" }).parse();
 		assertTrue(
 				unitUnderTest
 						.getFileNamesFromCommandLineParameters(cmd)
@@ -79,7 +81,7 @@ class FileNameProviderTest {
 
 	@Test
 	void throwsARuntimeException_passingDirectoryWithoutAPattern() throws Exception {
-		CommandLine cmd = new CommandLineParser().parse(new String[] { "-d", "src/test/resources/test-report/" });
+		CommandLineData cmd = new CommandLineParser(new String[] { "-d", "src/test/resources/test-report/" }).parse();
 		assertThrows(RuntimeException.class, () -> unitUnderTest.getFileNamesFromCommandLineParameters(cmd));
 	}
 

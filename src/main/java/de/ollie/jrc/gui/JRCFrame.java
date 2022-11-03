@@ -1,91 +1,181 @@
 package de.ollie.jrc.gui;
 
 import java.awt.BorderLayout;
+import java.awt.Component;
+import java.awt.Dimension;
+import java.awt.FlowLayout;
+import java.awt.GridLayout;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
-import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
+import java.nio.file.Path;
+import java.util.function.BooleanSupplier;
 
+import javax.swing.JButton;
 import javax.swing.JFrame;
-import javax.swing.JList;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
+import javax.swing.JTabbedPane;
+import javax.swing.JTextArea;
+import javax.swing.JTextField;
+import javax.swing.border.EmptyBorder;
 
 import de.ollie.jrc.JRC;
+import de.ollie.jrc.gui.ResourceManager.Localization;
 import de.ollie.jrc.logger.Logger;
+import lombok.AllArgsConstructor;
+import lombok.Generated;
+import lombok.Getter;
 
-public class JRCFrame extends JFrame implements ListSelectionListener, WindowListener {
+@Generated // OLI: excluding GUI from unit testing.
+public class JRCFrame extends JFrame implements WindowListener {
+
+	static final int HGAP = 3;
+	static final int VGAP = 3;
 
 	private static final Logger LOGGER = Logger.getLogger(JRCFrame.class.getSimpleName());
 
-	private JList<File> files;
+	private FilenameSelectorComponentFactory fnscf = new FilenameSelectorComponentFactory() {
+
+		@Override
+		public JButton createClearButton(FilenameSelector owner) {
+			return new JButton(getResource("filenameselector.button.clear.text"));
+		}
+
+		@Override
+		public JButton createSelectButton(FilenameSelector owner) {
+			return new JButton(getResource("filenameselector.button.select.text"));
+		}
+
+		@Override
+		public JTextField createTextField(FilenameSelector owner) {
+			return new JTextField(80);
+		}
+
+	};
+
+	private Localization localization = Localization.DE;
 
 	public JRCFrame(String dirName) {
 		super("JRC");
-		this.addWindowListener(this);
-		setContentPane(createMainPanel(dirName));
+		String path = Path.of(dirName).toAbsolutePath().toString();
+		localization = Localization.valueOf(System.getProperty("jrc.language", localization.name()).toUpperCase());
+		addWindowListener(this);
+		setMinimumSize(new Dimension(400, 200));
+		setContentPane(createMainPanel(path));
 		pack();
 	}
 
-	private JPanel createMainPanel(String dirName) {
-		JPanel p = new JPanel(new BorderLayout(3, 3));
-		files = createList(dirName);
-		p.add(new JScrollPane(files), BorderLayout.CENTER);
+	private JPanel createMainPanel(String path) {
+		JPanel p = new JPanel(new BorderLayout(HGAP, VGAP));
+		JTabbedPane tabbedPane = new JTabbedPane(JTabbedPane.LEFT);
+		tabbedPane.add(getResource("tab.header.text.check"), createCheckPanel(path));
+		tabbedPane.add(getResource("tab.header.text.usage"), createUsagePanel(path));
+		tabbedPane.add(getResource("tab.header.text.xml"), createXMLPanel(path));
+		p.add(tabbedPane);
 		return p;
 	}
 
-	private JList<File> createList(String dirName) {
-		JList<File> list = new JList<>();
-		list.setListData(getFiles(dirName));
-		list.setCellRenderer(new FileListCellRenderer());
-		list.addListSelectionListener(this);
-		return list;
+	private String getResource(String resourceId) {
+		return ResourceManager.INSTANCE.getString(localization, resourceId);
 	}
 
-	private File[] getFiles(String dirName) {
-		File d = new File(dirName);
-		List<File> l = new ArrayList<>();
-		try {
-			dirName = new File(dirName).getCanonicalPath();
-		} catch (IOException e) {
-			e.printStackTrace();
+	private JPanel createCheckPanel(String path) {
+		JButton buttonStart = new JButton(getResource("buttons.start.label"));
+		FilenameSelector filenameSelectorFile = new FilenameSelector(
+				path,
+				fnscf,
+				newPath -> buttonStart.setEnabled(newPath.toLowerCase().endsWith(".jrxml")));
+		JPanel p = createComponentPanel(
+				"check",
+				new ComponentData("check.filenameselectorfile.label", filenameSelectorFile));
+		p
+				.add(
+						createButtonPanel(
+								buttonStart,
+								() -> JRC.checkForFile(filenameSelectorFile.getPath(), false),
+								() -> filenameSelectorFile.getPath().toLowerCase().endsWith(".jrxml")),
+						BorderLayout.SOUTH);
+		return p;
+	}
+
+	private JPanel createButtonPanel(JButton buttonStart, Runnable starter, BooleanSupplier enabledChecker) {
+		JPanel buttons = new JPanel(new FlowLayout(FlowLayout.RIGHT, HGAP, VGAP));
+		buttonStart.addActionListener(e -> starter.run());
+		buttonStart.setEnabled(enabledChecker.getAsBoolean());
+		buttons.add(buttonStart);
+		return buttons;
+	}
+
+	@AllArgsConstructor
+	@Getter
+	private static class ComponentData {
+
+		String resourceId;
+		Component component;
+	}
+
+	private JPanel createComponentPanel(String descriptionResourceIdPrefix, ComponentData... componentData) {
+		JPanel p = new JPanel(new BorderLayout(HGAP, VGAP));
+		p.setBorder(new EmptyBorder(VGAP, HGAP, VGAP, HGAP));
+		int rows = componentData.length;
+		JPanel labels = new JPanel(new GridLayout(rows, 1, HGAP, VGAP));
+		JPanel components = new JPanel(new GridLayout(rows, 1, HGAP, VGAP));
+		JPanel panel = new JPanel(new BorderLayout(HGAP, VGAP));
+		for (ComponentData cd : componentData) {
+			labels.add(new JLabel(getResource(cd.getResourceId())));
+			components.add(cd.getComponent());
 		}
-		updateTitle(dirName);
-		if (!isRootDirectory(dirName)) {
-			l.add(new File(dirName + "/.."));
-		}
-		for (File f : d.listFiles()) {
-			if (f.isDirectory() || f.getName().toLowerCase().endsWith("jrxml")) {
-				l.add(f);
+		JTextArea description = new JTextArea(getResource(descriptionResourceIdPrefix + ".description.text"), 4, 40);
+		description.setEditable(false);
+		description.setLineWrap(true);
+		panel.add(new JScrollPane(description), BorderLayout.NORTH);
+		panel.add(labels, BorderLayout.WEST);
+		panel.add(components, BorderLayout.CENTER);
+		p.add(panel, BorderLayout.NORTH);
+		return p;
+	}
+
+	private JPanel createUsagePanel(String path) {
+		JButton buttonStart = new JButton(getResource("buttons.start.label"));
+		FilenameSelector filenameSelectorFile = new FilenameSelector(
+				path,
+				fnscf,
+				newPath -> buttonStart.setEnabled(newPath.toLowerCase().endsWith(".jrxml")));
+		FilenameSelector filenameSelectorReportsDirectory = new FilenameSelector(path, fnscf, null);
+		JPanel p = createComponentPanel(
+				"usage",
+				new ComponentData("usage.filenameselectorreportsdirectory.label", filenameSelectorReportsDirectory),
+				new ComponentData("usage.filenameselectorfile.label", filenameSelectorFile));
+		p.add(createButtonPanel(buttonStart, () -> {
+			try {
+				JRC.usage(filenameSelectorFile.getPath(), filenameSelectorReportsDirectory.getPath(), false);
+			} catch (Exception e) {
+				LOGGER.error("something went wrong while reading files for usage check!", e);
 			}
-		}
-		return l.toArray(new File[l.size()]);
+		}, () -> filenameSelectorFile.getPath().toLowerCase().endsWith(".jrxml")), BorderLayout.SOUTH);
+		return p;
 	}
 
-	private boolean isRootDirectory(String dirName) {
-		return dirName.equals("/") || dirName.endsWith(":\\") || dirName.endsWith(":/");
-	}
-
-	private void updateTitle(String dirName) {
-		setTitle("JRC - " + dirName);
-	}
-
-	@Override
-	public void valueChanged(ListSelectionEvent e) {
-		if (e.getSource() == files) {
-			File f = files.getSelectedValue();
-			if (f != null) {
-				if (f.isDirectory()) {
-					files.setListData(getFiles(f.getAbsolutePath()));
-				} else {
-					JRC.checkForFile(f.getAbsolutePath(), false);
-				}
+	private JPanel createXMLPanel(String path) {
+		JButton buttonStart = new JButton(getResource("buttons.start.label"));
+		FilenameSelector filenameSelectorFile = new FilenameSelector(
+				path,
+				fnscf,
+				newPath -> buttonStart.setEnabled(newPath.toLowerCase().endsWith(".jrxml")));
+		FilenameSelector filenameSelectorReportsDirectory = new FilenameSelector(path, fnscf, null);
+		JPanel p = createComponentPanel(
+				"xml",
+				new ComponentData("xml.filenameselectorreportsdirectory.label", filenameSelectorReportsDirectory),
+				new ComponentData("xml.filenameselectorfile.label", filenameSelectorFile));
+		p.add(createButtonPanel(buttonStart, () -> {
+			try {
+				JRC.xml(filenameSelectorFile.getPath(), filenameSelectorReportsDirectory.getPath());
+			} catch (Exception e) {
+				LOGGER.error("something went wrong while reading files for xml generation!", e);
 			}
-		}
+		}, () -> filenameSelectorFile.getPath().toLowerCase().endsWith(".jrxml")), BorderLayout.SOUTH);
+		return p;
 	}
 
 	@Override

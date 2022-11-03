@@ -5,8 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import org.apache.commons.cli.CommandLine;
-
+import de.ollie.jrc.CommandLineParser.CommandLineData;
 import de.ollie.jrc.util.StringListSplitter;
 
 public class FileNameProvider {
@@ -14,14 +13,14 @@ public class FileNameProvider {
 	public static final StringListSplitter STRING_LIST_SPLITTER = new StringListSplitter();
 	public static final DirectoryScanner DIRECTORY_SCANNER = new DirectoryScanner();
 
-	public List<String> getFileNamesFromCommandLineParameters(CommandLine cmd) {
+	public List<String> getFileNamesFromCommandLineParameters(CommandLineData cmd) {
 		return getFilesToCheck(cmd);
 	}
 
-	private List<String> getFilesToCheck(CommandLine cmd) {
+	private List<String> getFilesToCheck(CommandLineData cmd) {
 		List<String> fileNames = getFileNamesFromCommandLine(cmd);
-		String dir = getDirectoryFromCommandLine(cmd);
-		String pattern = getPatternFromCommandLine(cmd);
+		String dir = cmd.getDirectory();
+		String pattern = cmd.getFileNamePattern();
 		if (pattern != null) {
 			if (dir == null) {
 				dir = ".";
@@ -37,16 +36,8 @@ public class FileNameProvider {
 		return fileNames;
 	}
 
-	private String getDirectoryFromCommandLine(CommandLine cmd) {
-		return cmd.hasOption("d") ? cmd.getOptionValue("d") : null;
-	}
-
-	private List<String> getFileNamesFromCommandLine(CommandLine cmd) {
-		return cmd.hasOption("f") ? STRING_LIST_SPLITTER.split(cmd.getOptionValue("f")) : new ArrayList<>();
-	}
-
-	private String getPatternFromCommandLine(CommandLine cmd) {
-		return cmd.hasOption("p") ? cmd.getOptionValue("p") : null;
+	private List<String> getFileNamesFromCommandLine(CommandLineData cmd) {
+		return cmd.getFileName() != null ? STRING_LIST_SPLITTER.split(cmd.getFileName()) : new ArrayList<>();
 	}
 
 }
