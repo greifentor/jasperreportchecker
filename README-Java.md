@@ -58,3 +58,5 @@ java -jar target\jasperreportscleaner-1.0.0.jar check -d C:\workspace\document-p
 
 This command (```gui```) starts the application with a Swing GUI which allows to selected files for a check in a
 comfortable way.
+
+Passing vm argument ``-Djrc.language=EN`` allows to switch the language to english.
