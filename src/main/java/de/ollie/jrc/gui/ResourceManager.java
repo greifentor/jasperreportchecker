@@ -40,7 +40,7 @@ public class ResourceManager {
 				System
 				.getProperty(
 						"resource.file.name.pattern",
-								"jasperreportscleaner_" + TOKEN_PLACEHOLDER + "_resources.properties"));
+								"jasperreportscleaner_resource_" + TOKEN_PLACEHOLDER + ".properties"));
 	}
 
 	public ResourceManager(String localizationFilesDir, String fileNamePattern) {

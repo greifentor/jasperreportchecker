@@ -7,9 +7,9 @@ import java.util.Map;
 
 import javax.xml.bind.JAXBException;
 
-import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.ParseException;
 
+import de.ollie.jrc.CommandLineParser.CommandLineData;
 import de.ollie.jrc.gui.JRCFrame;
 import de.ollie.jrc.jrxml.DependencyDiagramBuilder;
 import de.ollie.jrc.jrxml.DirectoryReader;
@@ -36,7 +36,7 @@ public class JRC {
 
 	public static void main(String[] args) {
 		try {
-			CommandLine cmd = new CommandLineParser().parse(args);
+			CommandLineData cmd = new CommandLineParser(args).parse();
 			boolean somethingPrinted = true;
 			if ((args == null) || (args.length == 0) || "help".equalsIgnoreCase(args[0])) {
 				out.println("\nUsage: [command] {parameters}\n");
@@ -75,28 +75,28 @@ public class JRC {
 				}
 				somethingPrinted = fileNames
 						.stream()
-						.map(fileName -> checkForFile(fileName, cmd.hasOption("snfm")))
+						.map(fileName -> checkForFile(fileName, cmd.isSuppressMessageForFileHavingNoUnusedObjects()))
 						.reduce((b0, b1) -> b0 || b1)
 						.orElse(true);
 			} else if ("gui".equalsIgnoreCase(args[0])) {
-				String dirName = cmd.hasOption("d") ? cmd.getOptionValue("d") : ".";
+				String dirName = cmd.getDirectory() != null ? cmd.getDirectory() : ".";
 				new JRCFrame(dirName).setVisible(true);
 			} else if ("usage".equalsIgnoreCase(args[0])) {
-				String dir = cmd.getOptionValue("d");
+				String dir = cmd.getDirectory();
 				if ((dir == null) || dir.isEmpty()) {
 					dir = "./";
 				}
-				usage(cmd.getOptionValue("f"), dir, cmd.hasOption("l"));
+				usage(cmd.getFileName(), dir, cmd.isListOutput());
 			} else if ("xml".equalsIgnoreCase(args[0])) {
-				String dir = cmd.getOptionValue("d");
+				String dir = cmd.getDirectory();
 				if ((dir == null) || dir.isEmpty()) {
 					dir = "./";
 				}
-				String subreportDir = cmd.getOptionValue("sd");
+				String subreportDir = cmd.getSubreportDirectory();
 				if ((subreportDir == null) || subreportDir.isEmpty()) {
 					subreportDir = "./";
 				}
-				xml(cmd.getOptionValue("f"), subreportDir);
+				xml(cmd.getFileName(), subreportDir);
 			}
 			if (somethingPrinted) {
 				out.println();

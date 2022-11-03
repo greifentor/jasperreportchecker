@@ -17,6 +17,9 @@ import javax.swing.JFileChooser;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
+import lombok.Generated;
+
+@Generated // OLI: excluding GUI from unit testing.
 public class FilenameSelector extends JPanel {
 
 	public interface FilenameSelectorObserver {

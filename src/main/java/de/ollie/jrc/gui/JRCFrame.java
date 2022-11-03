@@ -14,7 +14,9 @@ import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
+import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.border.EmptyBorder;
 
@@ -22,8 +24,10 @@ import de.ollie.jrc.JRC;
 import de.ollie.jrc.gui.ResourceManager.Localization;
 import de.ollie.jrc.logger.Logger;
 import lombok.AllArgsConstructor;
+import lombok.Generated;
 import lombok.Getter;
 
+@Generated // OLI: excluding GUI from unit testing.
 public class JRCFrame extends JFrame implements WindowListener {
 
 	static final int HGAP = 3;
@@ -50,9 +54,12 @@ public class JRCFrame extends JFrame implements WindowListener {
 
 	};
 
+	private Localization localization = Localization.DE;
+
 	public JRCFrame(String dirName) {
 		super("JRC");
 		String path = Path.of(dirName).toAbsolutePath().toString();
+		localization = Localization.valueOf(System.getProperty("jrc.language", localization.name()));
 		addWindowListener(this);
 		setMinimumSize(new Dimension(400, 200));
 		setContentPane(createMainPanel(path));
@@ -70,7 +77,7 @@ public class JRCFrame extends JFrame implements WindowListener {
 	}
 
 	private String getResource(String resourceId) {
-		return ResourceManager.INSTANCE.getString(Localization.DE, resourceId);
+		return ResourceManager.INSTANCE.getString(localization, resourceId);
 	}
 
 	private JPanel createCheckPanel(String path) {
@@ -79,7 +86,9 @@ public class JRCFrame extends JFrame implements WindowListener {
 				path,
 				fnscf,
 				newPath -> buttonStart.setEnabled(newPath.toLowerCase().endsWith(".jrxml")));
-		JPanel p = createComponentPanel(new ComponentData("check.filenameselectorfile.label", filenameSelectorFile));
+		JPanel p = createComponentPanel(
+				"check",
+				new ComponentData("check.filenameselectorfile.label", filenameSelectorFile));
 		p
 				.add(
 						createButtonPanel(
@@ -106,7 +115,7 @@ public class JRCFrame extends JFrame implements WindowListener {
 		Component component;
 	}
 
-	private JPanel createComponentPanel(ComponentData... componentData) {
+	private JPanel createComponentPanel(String descriptionResourceIdPrefix, ComponentData... componentData) {
 		JPanel p = new JPanel(new BorderLayout(HGAP, VGAP));
 		p.setBorder(new EmptyBorder(VGAP, HGAP, VGAP, HGAP));
 		int rows = componentData.length;
@@ -117,6 +126,10 @@ public class JRCFrame extends JFrame implements WindowListener {
 			labels.add(new JLabel(getResource(cd.getResourceId())));
 			components.add(cd.getComponent());
 		}
+		JTextArea description = new JTextArea(getResource(descriptionResourceIdPrefix + ".description.text"), 4, 40);
+		description.setEditable(false);
+		description.setLineWrap(true);
+		panel.add(new JScrollPane(description), BorderLayout.NORTH);
 		panel.add(labels, BorderLayout.WEST);
 		panel.add(components, BorderLayout.CENTER);
 		p.add(panel, BorderLayout.NORTH);
@@ -131,6 +144,7 @@ public class JRCFrame extends JFrame implements WindowListener {
 				newPath -> buttonStart.setEnabled(newPath.toLowerCase().endsWith(".jrxml")));
 		FilenameSelector filenameSelectorReportsDirectory = new FilenameSelector(path, fnscf, null);
 		JPanel p = createComponentPanel(
+				"usage",
 				new ComponentData("usage.filenameselectorreportsdirectory.label", filenameSelectorReportsDirectory),
 				new ComponentData("usage.filenameselectorfile.label", filenameSelectorFile));
 		p.add(createButtonPanel(buttonStart, () -> {
@@ -151,6 +165,7 @@ public class JRCFrame extends JFrame implements WindowListener {
 				newPath -> buttonStart.setEnabled(newPath.toLowerCase().endsWith(".jrxml")));
 		FilenameSelector filenameSelectorReportsDirectory = new FilenameSelector(path, fnscf, null);
 		JPanel p = createComponentPanel(
+				"xml",
 				new ComponentData("xml.filenameselectorreportsdirectory.label", filenameSelectorReportsDirectory),
 				new ComponentData("xml.filenameselectorfile.label", filenameSelectorFile));
 		p.add(createButtonPanel(buttonStart, () -> {
