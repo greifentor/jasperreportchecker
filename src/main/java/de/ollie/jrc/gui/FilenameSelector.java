@@ -8,6 +8,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
+import java.awt.event.FocusListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.io.File;
@@ -39,16 +40,28 @@ public class FilenameSelector extends JPanel {
 	public FilenameSelector(String path, FilenameSelectorComponentFactory fsecf, FilenameSelectorObserver observer) {
 		super(new BorderLayout(JRCFrame.HGAP, JRCFrame.VGAP));
 		this.observer = observer;
-		this.path = path;
+		setPath(path);
 		textField = fsecf.createTextField(this);
 		textField.setText(path);
 		textField.setPreferredSize(new Dimension(123, 24));
 		textField.addKeyListener(new KeyAdapter() {
 
+			@Override
 			public void keyPressed(KeyEvent e) {
 				if (e.getKeyCode() == KeyEvent.VK_F4) {
 					button.doClick();
 				}
+			}
+		});
+		textField.addFocusListener(new FocusListener() {
+
+			@Override
+			public void focusLost(FocusEvent e) {
+				setPath(textField.getText());
+			}
+
+			@Override
+			public void focusGained(FocusEvent e) {
 			}
 		});
 		button = fsecf.createSelectButton(this);
@@ -83,7 +96,7 @@ public class FilenameSelector extends JPanel {
 	}
 
 	public void doClear() {
-		path = ".";
+		setPath(".");
 		textField.setText(path);
 	}
 
@@ -106,6 +119,10 @@ public class FilenameSelector extends JPanel {
 		return path;
 	}
 
+	public void setPath(String path) {
+		this.path = path;
+	}
+
 	public javax.swing.filechooser.FileFilter getFileFilter() {
 		return filefilter;
 	}
@@ -115,7 +132,7 @@ public class FilenameSelector extends JPanel {
 	}
 
 	public void setText(String s) {
-		path = s;
+		setPath(s);
 		textField.setText(s);
 		if (observer != null) {
 			observer.pathChanged(s);
