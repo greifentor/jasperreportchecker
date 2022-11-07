@@ -62,12 +62,30 @@ public class JasperReport {
 	}
 
 	private List<String> findAllCalledReportsFromBands(List<? extends BandProvider> bandProviders) {
-		return bandProviders
+		return findAllBands(bandProviders)
 				.stream()
-				.flatMap(bandProvider -> bandProvider.getBands().stream())
 				.flatMap(subreportProvider -> subreportProvider.getSubreports().stream())
 				.map(Subreport::getPlainCalledFileName)
 				.collect(Collectors.toList());
 	}
 
+	public List<Band> findAllBands() {
+		List<Band> bands = new ArrayList<>();
+		bands.addAll(findAllBands(getColumnFooter()));
+		bands.addAll(findAllBands(getColumnHeader()));
+		bands.addAll(findAllBands(getDetails()));
+		bands.addAll(findAllBands(getLastPageFooter()));
+		bands.addAll(findAllBands(getPageFooter()));
+		bands.addAll(findAllBands(getPageHeader()));
+		bands.addAll(findAllBands(getSummary()));
+		bands.addAll(findAllBands(getTitle()));
+		return bands;
+	}
+
+	private List<Band> findAllBands(List<? extends BandProvider> bandProviders) {
+		return bandProviders
+				.stream()
+				.flatMap(bandProvider -> bandProvider.getBands().stream())
+				.collect(Collectors.toList());
+	}
 }

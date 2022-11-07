@@ -1,7 +1,9 @@
 package de.ollie.jrc.jrxml;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
@@ -80,13 +82,75 @@ class FileReaderTest {
 
 		@Test
 		void setTheDescriptionOfTheFieldCorrectly() throws Exception {
-			assertTrue(
+			assertEquals(
+					"aFieldDescription",
 					unitUnderTest
 							.readFromFile()
 							.findFieldByName("usedField")
 							.get()
-							.getFieldDescription()
-							.equals("aFieldDescription"));
+							.getFieldDescription());
+		}
+
+		@Test
+		void setTheFontNameForATextElementOfTheTextFieldCorrectly_ifThereIsOneSet() throws Exception {
+			assertEquals(
+					"Monospaced",
+					unitUnderTest
+							.readFromFile()
+							.getDetails()
+							.get(0)
+							.getBands()
+							.get(0)
+							.getTextFields()
+							.get(1)
+							.getTextElement()
+							.getFont()
+							.getFontName());
+		}
+
+		@Test
+		void setNullForTheWholeTextElementOfTheTextField_ifThereIsNoChange() throws Exception {
+			assertNull(
+					unitUnderTest
+							.readFromFile()
+							.getDetails()
+							.get(0)
+							.getBands()
+							.get(0)
+							.getTextFields()
+							.get(0)
+							.getTextElement());
+		}
+
+		@Test
+		void setTheFontNameForATextElementOfTheStaticTextCorrectly_ifThereIsOneSet() throws Exception {
+			assertEquals(
+					"Monospaced",
+					unitUnderTest
+							.readFromFile()
+							.getDetails()
+							.get(0)
+							.getBands()
+							.get(0)
+							.getStaticTexts()
+							.get(1)
+							.getTextElement()
+							.getFont()
+							.getFontName());
+		}
+
+		@Test
+		void setNullForTheWholeTextElementOfTheStaticText_ifThereIsNoChange() throws Exception {
+			assertNull(
+					unitUnderTest
+							.readFromFile()
+							.getDetails()
+							.get(0)
+							.getBands()
+							.get(0)
+							.getStaticTexts()
+							.get(0)
+							.getTextElement());
 		}
 
 	}

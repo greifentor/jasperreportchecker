@@ -7,8 +7,14 @@ import java.awt.FlowLayout;
 import java.awt.GridLayout;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
+import java.io.File;
+import java.io.IOException;
 import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
 import java.util.function.BooleanSupplier;
+import java.util.stream.Collectors;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -19,9 +25,14 @@ import javax.swing.JTabbedPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.border.EmptyBorder;
+import javax.xml.bind.JAXBException;
 
+import de.ollie.jrc.DirectoryScanner;
 import de.ollie.jrc.JRC;
 import de.ollie.jrc.gui.ResourceManager.Localization;
+import de.ollie.jrc.jrxml.FileReader;
+import de.ollie.jrc.jrxml.FontLister;
+import de.ollie.jrc.jrxml.model.JasperReport;
 import de.ollie.jrc.logger.Logger;
 import lombok.AllArgsConstructor;
 import lombok.Generated;
@@ -70,6 +81,7 @@ public class JRCFrame extends JFrame implements WindowListener {
 		JPanel p = new JPanel(new BorderLayout(HGAP, VGAP));
 		JTabbedPane tabbedPane = new JTabbedPane(JTabbedPane.LEFT);
 		tabbedPane.add(getResource("tab.header.text.check"), createCheckPanel(path));
+		tabbedPane.add(getResource("tab.header.text.fontlister"), createFontListerPanel(path));
 		tabbedPane.add(getResource("tab.header.text.usage"), createUsagePanel(path));
 		tabbedPane.add(getResource("tab.header.text.xml"), createXMLPanel(path));
 		p.add(tabbedPane);
@@ -97,6 +109,45 @@ public class JRCFrame extends JFrame implements WindowListener {
 								() -> filenameSelectorFile.getPath().toLowerCase().endsWith(".jrxml")),
 						BorderLayout.SOUTH);
 		return p;
+	}
+
+	private JPanel createFontListerPanel(String path) {
+		JButton buttonStart = new JButton(getResource("buttons.start.label"));
+		FilenameSelector filenameSelectorDirectory = new FilenameSelector(path, fnscf, null);
+		JTextField textFieldExclude = new JTextField(40);
+		JPanel p = createComponentPanel(
+				"fontlister",
+				new ComponentData("fontlister.filenameselectordirectory.label", filenameSelectorDirectory),
+				new ComponentData("fontlister.textfieldexclude.label", textFieldExclude));
+		p
+				.add(
+						createButtonPanel(
+								buttonStart,
+								() -> listFonts(filenameSelectorDirectory.getPath(), textFieldExclude.getText()),
+								() -> new File(filenameSelectorDirectory.getPath()).isDirectory()),
+						BorderLayout.SOUTH);
+		return p;
+	}
+
+	private void listFonts(String directory, String exclude) {
+		List<File> files = new DirectoryScanner().scan(new ArrayList<>(), directory, "*.jrxml");
+		FontLister fontLister = new FontLister();
+		List<String> fileNames = files.stream().map(File::getAbsolutePath).sorted().collect(Collectors.toList());
+		for (String fileName : fileNames) {
+			try {
+				JasperReport jasperReport = new FileReader(fileName).readFromFile();
+				Set<String> fontNames = fontLister.getUsedFontNames(jasperReport);
+				if ((exclude != null) && !exclude.isEmpty()) {
+					fontNames.remove(exclude);
+				}
+				if (!fontNames.isEmpty()) {
+					System.out.println(fileName + ":");
+					fontNames.stream().sorted().forEach(fontName -> System.out.println("- " + fontName));
+				}
+			} catch (IOException | JAXBException e) {
+				LOGGER.error("something went wrong while reading file for font listing: " + fileName, e);
+			}
+		}
 	}
 
 	private JPanel createButtonPanel(JButton buttonStart, Runnable starter, BooleanSupplier enabledChecker) {
