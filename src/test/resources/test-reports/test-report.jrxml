@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- Created with Jaspersoft Studio version 6.16.0.final using JasperReports Library version 6.16.0-48579d909b7943b64690c65c71e07e0b80981928  -->
+<!-- Created with Jaspersoft Studio version 6.6.0.final using JasperReports Library version 6.6.0  -->
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="test-report" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="ce2db436-2153-43c2-939b-69b144b913e6">
 	<parameter name="usedParameter" class="java.lang.String"/>
 	<parameter name="unusedParameter" class="java.lang.String"/>
@@ -35,6 +35,24 @@
 				<reportElement x="13" y="19" width="100" height="30" uuid="f37cf551-8d44-4c81-afa4-18cd6e26e52b"/>
 				<textFieldExpression><![CDATA[$F{usedField}]]></textFieldExpression>
 			</textField>
+			<textField>
+				<reportElement x="70" y="70" width="100" height="30" uuid="8eda6872-0210-4eec-874d-3939a0dfcc2a"/>
+				<textElement>
+					<font fontName="Monospaced" size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Text Field"]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="342" y="26" width="100" height="30" uuid="dd3a1ffe-d7d1-42e6-8925-987e101d9b44"/>
+				<text><![CDATA[Static Text]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="288" y="72" width="100" height="30" uuid="6b1760b9-7460-4581-a5a0-b3735347f6df"/>
+				<textElement>
+					<font fontName="Monospaced"/>
+				</textElement>
+				<text><![CDATA[With Font Change]]></text>
+			</staticText>
 		</band>
 	</detail>
 	<columnFooter>
