@@ -16,6 +16,7 @@ public class TopUsageReportListBuilder {
 	private PrintStream out;
 	private Map<String, JasperReport> reports;
 	private Map<String, List<String>> dependencyMapping;
+	private StringBuilder output = new StringBuilder();
 
 	public TopUsageReportListBuilder(String fileName, Map<String, JasperReport> reports, PrintStream out) {
 		this.fileName = FileNames.normalize(fileName);
@@ -26,9 +27,10 @@ public class TopUsageReportListBuilder {
 		}
 	}
 
-	public synchronized void build() {
+	public synchronized String build() {
 		initializeDependencyMapping();
 		writeDependenciesAsUMLComponentDiagramToOut();
+		return output.toString();
 	}
 
 	private void initializeDependencyMapping() {
@@ -62,6 +64,7 @@ public class TopUsageReportListBuilder {
 	private void writeDependenciesAsUMLComponentDiagramToOut(String reportName) {
 		dependencyMapping.getOrDefault(reportName, new ArrayList<>()).forEach(dependentReportName -> {
 			if (!dependencyMapping.containsKey(dependentReportName)) {
+				output.append(dependentReportName + "\n");
 				out.println(dependentReportName);
 			}
 			writeDependenciesAsUMLComponentDiagramToOut(dependentReportName);

@@ -4,6 +4,7 @@ import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
+import java.awt.Font;
 import java.awt.GridLayout;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
@@ -21,6 +22,7 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.JSplitPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
@@ -65,10 +67,14 @@ public class JRCFrame extends JFrame implements WindowListener {
 
 	};
 
+	private JTextArea textAreaOutput;
+
 	private Localization localization = Localization.DE;
 
 	public JRCFrame(String dirName) {
 		super("JRC");
+		textAreaOutput = new JTextArea(40, 20);
+		textAreaOutput.setFont(new Font("monospaced", Font.PLAIN, 11));
 		String path = Path.of(dirName).toAbsolutePath().toString();
 		localization = Localization.valueOf(System.getProperty("jrc.language", localization.name()).toUpperCase());
 		addWindowListener(this);
@@ -84,7 +90,8 @@ public class JRCFrame extends JFrame implements WindowListener {
 		tabbedPane.add(getResource("tab.header.text.fontlister"), createFontListerPanel(path));
 		tabbedPane.add(getResource("tab.header.text.usage"), createUsagePanel(path));
 		tabbedPane.add(getResource("tab.header.text.xml"), createXMLPanel(path));
-		p.add(tabbedPane);
+		JSplitPane splitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT, tabbedPane, new JScrollPane(textAreaOutput));
+		p.add(splitPane);
 		return p;
 	}
 
@@ -94,18 +101,20 @@ public class JRCFrame extends JFrame implements WindowListener {
 
 	private JPanel createCheckPanel(String path) {
 		JButton buttonStart = new JButton(getResource("buttons.start.label"));
-		FilenameSelector filenameSelectorFile = new FilenameSelector(
-				path,
-				fnscf,
-				newPath -> buttonStart.setEnabled(newPath.toLowerCase().endsWith(".jrxml")));
-		JPanel p = createComponentPanel(
-				"check",
-				new ComponentData("check.filenameselectorfile.label", filenameSelectorFile));
+		FilenameSelector filenameSelectorFile =
+				new FilenameSelector(
+						path,
+						fnscf,
+						newPath -> buttonStart.setEnabled(newPath.toLowerCase().endsWith(".jrxml")));
+		JPanel p =
+				createComponentPanel(
+						"check",
+						new ComponentData("check.filenameselectorfile.label", filenameSelectorFile));
 		p
 				.add(
 						createButtonPanel(
 								buttonStart,
-								() -> JRC.checkForFile(filenameSelectorFile.getPath(), false),
+								() -> textAreaOutput.setText(JRC.checkForFile(filenameSelectorFile.getPath(), false)),
 								() -> filenameSelectorFile.getPath().toLowerCase().endsWith(".jrxml")),
 						BorderLayout.SOUTH);
 		return p;
@@ -115,10 +124,11 @@ public class JRCFrame extends JFrame implements WindowListener {
 		JButton buttonStart = new JButton(getResource("buttons.start.label"));
 		FilenameSelector filenameSelectorDirectory = new FilenameSelector(path, fnscf, null);
 		JTextField textFieldExclude = new JTextField(40);
-		JPanel p = createComponentPanel(
-				"fontlister",
-				new ComponentData("fontlister.filenameselectordirectory.label", filenameSelectorDirectory),
-				new ComponentData("fontlister.textfieldexclude.label", textFieldExclude));
+		JPanel p =
+				createComponentPanel(
+						"fontlister",
+						new ComponentData("fontlister.filenameselectordirectory.label", filenameSelectorDirectory),
+						new ComponentData("fontlister.textfieldexclude.label", textFieldExclude));
 		p
 				.add(
 						createButtonPanel(
@@ -133,6 +143,7 @@ public class JRCFrame extends JFrame implements WindowListener {
 		List<File> files = new DirectoryScanner().scan(new ArrayList<>(), directory, "*.jrxml");
 		FontLister fontLister = new FontLister();
 		List<String> fileNames = files.stream().map(File::getAbsolutePath).sorted().collect(Collectors.toList());
+		StringBuilder sb = new StringBuilder();
 		for (String fileName : fileNames) {
 			try {
 				JasperReport jasperReport = new FileReader(fileName).readFromFile();
@@ -141,13 +152,20 @@ public class JRCFrame extends JFrame implements WindowListener {
 					fontNames.remove(exclude);
 				}
 				if (!fontNames.isEmpty()) {
-					System.out.println(fileName + ":");
-					fontNames.stream().sorted().forEach(fontName -> System.out.println("- " + fontName));
+					String s = fileName + ":\n";
+					System.out.print(s);
+					sb.append(s);
+					fontNames.stream().sorted().forEach(fontName -> {
+						String o = "- " + fontName + "\n";
+						System.out.print(o);
+						sb.append(o);
+					});
 				}
 			} catch (IOException | JAXBException e) {
 				LOGGER.error("something went wrong while reading file for font listing: " + fileName, e);
 			}
 		}
+		textAreaOutput.setText(sb.toString());
 	}
 
 	private JPanel createButtonPanel(JButton buttonStart, Runnable starter, BooleanSupplier enabledChecker) {
@@ -189,18 +207,28 @@ public class JRCFrame extends JFrame implements WindowListener {
 
 	private JPanel createUsagePanel(String path) {
 		JButton buttonStart = new JButton(getResource("buttons.start.label"));
-		FilenameSelector filenameSelectorFile = new FilenameSelector(
-				path,
-				fnscf,
-				newPath -> buttonStart.setEnabled(newPath.toLowerCase().endsWith(".jrxml")));
+		FilenameSelector filenameSelectorFile =
+				new FilenameSelector(
+						path,
+						fnscf,
+						newPath -> buttonStart.setEnabled(newPath.toLowerCase().endsWith(".jrxml")));
 		FilenameSelector filenameSelectorReportsDirectory = new FilenameSelector(path, fnscf, null);
-		JPanel p = createComponentPanel(
-				"usage",
-				new ComponentData("usage.filenameselectorreportsdirectory.label", filenameSelectorReportsDirectory),
-				new ComponentData("usage.filenameselectorfile.label", filenameSelectorFile));
+		JPanel p =
+				createComponentPanel(
+						"usage",
+						new ComponentData(
+								"usage.filenameselectorreportsdirectory.label",
+								filenameSelectorReportsDirectory),
+						new ComponentData("usage.filenameselectorfile.label", filenameSelectorFile));
 		p.add(createButtonPanel(buttonStart, () -> {
 			try {
-				JRC.usage(filenameSelectorFile.getPath(), filenameSelectorReportsDirectory.getPath(), false);
+				textAreaOutput
+						.setText(
+								JRC
+										.usage(
+												filenameSelectorFile.getPath(),
+												filenameSelectorReportsDirectory.getPath(),
+												false));
 			} catch (Exception e) {
 				LOGGER.error("something went wrong while reading files for usage check!", e);
 			}
@@ -210,18 +238,23 @@ public class JRCFrame extends JFrame implements WindowListener {
 
 	private JPanel createXMLPanel(String path) {
 		JButton buttonStart = new JButton(getResource("buttons.start.label"));
-		FilenameSelector filenameSelectorFile = new FilenameSelector(
-				path,
-				fnscf,
-				newPath -> buttonStart.setEnabled(newPath.toLowerCase().endsWith(".jrxml")));
+		FilenameSelector filenameSelectorFile =
+				new FilenameSelector(
+						path,
+						fnscf,
+						newPath -> buttonStart.setEnabled(newPath.toLowerCase().endsWith(".jrxml")));
 		FilenameSelector filenameSelectorReportsDirectory = new FilenameSelector(path, fnscf, null);
-		JPanel p = createComponentPanel(
-				"xml",
-				new ComponentData("xml.filenameselectorreportsdirectory.label", filenameSelectorReportsDirectory),
-				new ComponentData("xml.filenameselectorfile.label", filenameSelectorFile));
+		JPanel p =
+				createComponentPanel(
+						"xml",
+						new ComponentData(
+								"xml.filenameselectorreportsdirectory.label",
+								filenameSelectorReportsDirectory),
+						new ComponentData("xml.filenameselectorfile.label", filenameSelectorFile));
 		p.add(createButtonPanel(buttonStart, () -> {
 			try {
-				JRC.xml(filenameSelectorFile.getPath(), filenameSelectorReportsDirectory.getPath());
+				textAreaOutput
+						.setText(JRC.xml(filenameSelectorFile.getPath(), filenameSelectorReportsDirectory.getPath()));
 			} catch (Exception e) {
 				LOGGER.error("something went wrong while reading files for xml generation!", e);
 			}

@@ -10,18 +10,26 @@ public class XMLWriter {
 
 	private final NodeSampleDataGenerator nodeSampleDateGenerator;
 
-	public void write(XMLNode rootNode, PrintStream printStream) {
+	public String write(XMLNode rootNode, PrintStream printStream) {
+		StringBuilder sb = new StringBuilder();
 		if (rootNode == null) {
-			return;
+			return "";
 		}
-		printStream.print("<" + rootNode.getName() + ">");
+		String s = "<" + rootNode.getName() + ">";
+		printStream.print(s);
+		sb.append(s);
 		if (rootNode.getNodes().isEmpty()) {
-			printStream.print(nodeSampleDateGenerator.getSampleDateFor(rootNode));
+			s = String.valueOf(nodeSampleDateGenerator.getSampleDateFor(rootNode));
+			printStream.print(s);
+			sb.append(s);
 		}
 		for (XMLNode node : rootNode.getNodes()) {
-			write(node, printStream);
+			sb.append(write(node, printStream));
 		}
-		printStream.print("</" + rootNode.getName() + ">");
+		s = "</" + rootNode.getName() + ">";
+		printStream.print(s);
+		sb.append(s);
+		return sb.toString();
 	}
 
 }

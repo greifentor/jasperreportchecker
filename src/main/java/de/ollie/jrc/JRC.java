@@ -76,6 +76,7 @@ public class JRC {
 				somethingPrinted = fileNames
 						.stream()
 						.map(fileName -> checkForFile(fileName, cmd.isSuppressMessageForFileHavingNoUnusedObjects()))
+						.map(s -> !s.isEmpty())
 						.reduce((b0, b1) -> b0 || b1)
 						.orElse(true);
 			} else if ("gui".equalsIgnoreCase(args[0])) {
@@ -114,43 +115,43 @@ public class JRC {
 		}
 	}
 
-	public static boolean checkForFile(String jrxmlFileName, boolean suppressNothingFoundMessage) {
+	public static String checkForFile(String jrxmlFileName, boolean suppressNothingFoundMessage) {
 		List<String> messages = UNUSED_OBJECT_CHECKER.checkForUnusedFieldsParametersAndVariables(jrxmlFileName);
 		boolean suppressMessages = isMessageToSuppress(messages, suppressNothingFoundMessage);
-		boolean somethingPrinted = false;
+		StringBuilder sb = new StringBuilder();
 		if (!suppressMessages) {
 			out.println("\nProcessing: " + jrxmlFileName);
-			somethingPrinted = true;
 		}
 		if (messages.isEmpty()) {
 			if (!suppressMessages) {
 				out.println("No unused field, parameter or variable found.");
 			}
 		} else {
-			messages.stream().sorted((s0, s1) -> s0.compareTo(s1)).forEach(out::println);
-			somethingPrinted = true;
+			messages.stream().sorted((s0, s1) -> s0.compareTo(s1)).forEach(s -> {
+				System.out.println(s);
+				sb.append(s + "\n");
+			});
 		}
-		return somethingPrinted;
+		return sb.toString();
 	}
 
 	private static boolean isMessageToSuppress(List<String> messages, boolean suppressNothingFoundMessage) {
 		return messages.isEmpty() && suppressNothingFoundMessage;
 	}
 
-	public static void usage(String fileName, String dir, boolean topLevelList) throws IOException, JAXBException {
+	public static String usage(String fileName, String dir, boolean topLevelList) throws IOException, JAXBException {
 		Map<String, JasperReport> reports = new DirectoryReader(dir).readAllReports();
 		String plainFileName = fileName.replace(dir, "");
 		if (topLevelList) {
-			new TopUsageReportListBuilder(plainFileName, reports, out).build();
-		} else {
-			new DependencyDiagramBuilder(plainFileName, reports, out).build();
+			return new TopUsageReportListBuilder(plainFileName, reports, out).build();
 		}
+		return new DependencyDiagramBuilder(plainFileName, reports, out).build();
 	}
 
-	public static void xml(String reportFileName, String subreportDir) throws IOException, JAXBException {
+	public static String xml(String reportFileName, String subreportDir) throws IOException, JAXBException {
 		JasperReport report = new FileReader(reportFileName).readFromFile();
 		XMLNode rootNode = new SampleXMLBuilder().buildXMLFromJasperReport(report, subreportDir);
-		new XMLWriter(NODE_SAMPLE_DATA_GENERATOR).write(rootNode, out);
+		return new XMLWriter(NODE_SAMPLE_DATA_GENERATOR).write(rootNode, out);
 	}
 
 }

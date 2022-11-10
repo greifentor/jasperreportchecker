@@ -16,6 +16,7 @@ public class DependencyDiagramBuilder {
 	private PrintStream out;
 	private Map<String, JasperReport> reports;
 	private Map<String, List<String>> dependencyMapping;
+	private StringBuilder output = new StringBuilder();
 
 	public DependencyDiagramBuilder(String fileName, Map<String, JasperReport> reports, PrintStream out) {
 		this.fileName = FileNames.normalize(fileName);
@@ -26,17 +27,18 @@ public class DependencyDiagramBuilder {
 		}
 	}
 
-	public synchronized void build() {
+	public synchronized String build() {
 		writeUMLStart();
 		initializeDependencyMapping();
 		writeDependenciesAsUMLComponentDiagramToOut();
 		writeUMLEnd();
+		return output.toString();
 	}
 
 	private void writeUMLStart() {
-		out.println("@startuml");
-		out.println();
-		out.println("[" + fileName + "]");
+		String start = "@startuml\n\n[" + fileName + "]\n";
+		out.print(start);
+		output.append(start);
 	}
 
 	private void initializeDependencyMapping() {
@@ -80,14 +82,17 @@ public class DependencyDiagramBuilder {
 
 	private void writeDependenciesAsUMLComponentDiagramToOut(String reportName) {
 		dependencyMapping.getOrDefault(reportName, new ArrayList<>()).forEach(dependentReportName -> {
-			out.println("[" + reportName + "] <-- [" + dependentReportName + "]");
+			String s = "[" + reportName + "] <-- [" + dependentReportName + "]\n";
+			out.print(s);
+			output.append(s);
 			writeDependenciesAsUMLComponentDiagramToOut(dependentReportName);
 		});
 	}
 
 	private void writeUMLEnd() {
-		out.println();
-		out.println("@enduml");
+		String s = "\n@enduml\n";
+		out.print(s);
+		output.append(s);
 	}
 
 }
