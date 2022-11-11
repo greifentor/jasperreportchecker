@@ -124,7 +124,9 @@ public class JRC {
 		}
 		if (messages.isEmpty()) {
 			if (!suppressMessages) {
-				out.println("No unused field, parameter or variable found.");
+				String message = "No unused field, parameter or variable found.";
+				out.println(message);
+				sb.append(message);
 			}
 		} else {
 			messages.stream().sorted((s0, s1) -> s0.compareTo(s1)).forEach(s -> {
