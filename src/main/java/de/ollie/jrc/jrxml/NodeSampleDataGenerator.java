@@ -4,8 +4,8 @@ import de.ollie.jrc.xml.model.XMLNode;
 
 public class NodeSampleDataGenerator {
 
-	static final String BOOLEAN_CLASS_NAME = "java.util.Boolean";
-	static final String STRING_CLASS_NAME = "java.util.String";
+	static final String BOOLEAN_CLASS_NAME = "java.lang.Boolean";
+	static final String STRING_CLASS_NAME = "java.lang.String";
 
 	public static final String UNKNOWN = "!!!UNKNOWN!!!";
 

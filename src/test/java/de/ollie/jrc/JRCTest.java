@@ -110,7 +110,7 @@ class JRCTest {
 			String fileName = "src/test/resources/test-reports/XMLBuilderChecker-XML-SimpleTest.jrxml";
 			JRC.main(new String[] { "xml", "-f", fileName });
 			assertEquals(
-					"<root><commons><usedField>" + UNKNOWN + "</usedField></commons></root>",
+					"<root><commons><usedField>USEDFIELD</usedField></commons></root>",
 					baos.toString().replace("\r", "").replace("\n", ""));
 		}
 
@@ -120,10 +120,7 @@ class JRCTest {
 					"src/test/resources/test-reports/XMLBuilderChecker-XML-WithSubreport-RootPathPassed.jrxml";
 			JRC.main(new String[] { "xml", "-f", fileName, "-sd", "src/test/resources/test-reports/" });
 			assertEquals(
-					"<root><commons><usedField>" + UNKNOWN
-							+ "</usedField><subreportField>"
-							+ UNKNOWN
-							+ "</subreportField></commons></root>",
+					"<root><commons><usedField>USEDFIELD</usedField><subreportField>SUBREPORTFIELD</subreportField></commons></root>",
 					baos.toString().replace("\r", "").replace("\n", ""));
 		}
 
@@ -132,12 +129,7 @@ class JRCTest {
 			String fileName = "src/test/resources/test-reports/XMLBuilderChecker-XML-WithSubreport-OwnPathPassed.jrxml";
 			JRC.main(new String[] { "xml", "-f", fileName, "-sd", "src/test/resources/test-reports/" });
 			assertEquals(
-					"<root><commons><usedField>" + UNKNOWN
-							+ "</usedField><subreport><subreportField0>"
-							+ UNKNOWN
-							+ "</subreportField0><sub><path><subreportField1>"
-							+ UNKNOWN
-							+ "</subreportField1></path></sub></subreport></commons></root>",
+					"<root><commons><usedField>USEDFIELD</usedField><subreport><subreportField0>SUBREPORTFIELD0</subreportField0><sub><path><subreportField1>SUBREPORTFIELD1</subreportField1></path></sub></subreport></commons></root>",
 					baos.toString().replace("\r", "").replace("\n", ""));
 		}
 
