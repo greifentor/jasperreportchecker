@@ -130,7 +130,7 @@ public class JRC {
 			}
 		} else {
 			messages.stream().sorted((s0, s1) -> s0.compareTo(s1)).forEach(s -> {
-				System.out.println(s);
+				out.println(s);
 				sb.append(s + "\n");
 			});
 		}

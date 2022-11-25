@@ -48,6 +48,8 @@ public class JRCFrame extends JFrame implements WindowListener {
 
 	private static final Logger LOGGER = Logger.getLogger(JRCFrame.class.getSimpleName());
 
+	private static final CorrectFileSelectionChecker correctFileSelectionChecker = new CorrectFileSelectionChecker();
+
 	private FilenameSelectorComponentFactory fnscf = new FilenameSelectorComponentFactory() {
 
 		@Override
@@ -105,7 +107,7 @@ public class JRCFrame extends JFrame implements WindowListener {
 				new FilenameSelector(
 						path,
 						fnscf,
-						newPath -> buttonStart.setEnabled(newPath.toLowerCase().endsWith(".jrxml")));
+						newPath -> buttonStart.setEnabled(correctFileSelectionChecker.isValid(newPath, null)));
 		JPanel p =
 				createComponentPanel(
 						"check",
