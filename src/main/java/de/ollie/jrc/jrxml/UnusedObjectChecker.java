@@ -12,14 +12,15 @@ import de.ollie.jrc.jrxml.model.Field;
 import de.ollie.jrc.jrxml.model.JasperReport;
 import de.ollie.jrc.jrxml.model.Parameter;
 import de.ollie.jrc.jrxml.model.Variable;
+import de.ollie.jrc.util.StringListSplitter;
 
 public class UnusedObjectChecker {
 
-	public List<String> checkForUnusedFieldsParametersAndVariables(String jrxmlFileName) {
+	public List<String> checkForUnusedFieldsParametersAndVariables(String jrxmlFileName, String excludes) {
 		try {
 			JasperReport jasperReport = new FileReader(jrxmlFileName).readFromFile();
 			String fileContent = Files.readString(Path.of(jrxmlFileName));
-			return listUnusedFieldsParametersAndVariablesToConsole(jasperReport, fileContent);
+			return listUnusedFieldsParametersAndVariablesToConsole(jasperReport, fileContent, excludes);
 		} catch (IOException | JAXBException e) {
 			throw new RuntimeException(
 					"something went wrong while reading the JRXML file (" + jrxmlFileName
@@ -31,20 +32,25 @@ public class UnusedObjectChecker {
 	}
 
 	private List<String> listUnusedFieldsParametersAndVariablesToConsole(JasperReport jasperReport,
-			String fileContent) {
+			String fileContent, String excludes) {
 		List<String> messages = new ArrayList<>();
+		List<String> exclude = StringListSplitter.INSTANCE.split(excludes);
+		exclude = exclude != null ? exclude : List.of();
 		for (Field field : jasperReport.getFields()) {
-			if (!fileContent.contains("$F{" + field.getName() + "}")) {
+			String name = "$F{" + field.getName() + "}";
+			if (!fileContent.contains(name) && !exclude.contains(name)) {
 				messages.add("Field " + field.getName());
 			}
 		}
 		for (Parameter parameter : jasperReport.getParameters()) {
-			if (!fileContent.contains("$P{" + parameter.getName() + "}")) {
+			String name = "$P{" + parameter.getName() + "}";
+			if (!fileContent.contains(name) && !exclude.contains(name)) {
 				messages.add("Parameter " + parameter.getName());
 			}
 		}
 		for (Variable variable : jasperReport.getVariables()) {
-			if (!fileContent.contains("$V{" + variable.getName() + "}")) {
+			String name = "$V{" + variable.getName() + "}";
+			if (!fileContent.contains(name) && !exclude.contains(name)) {
 				messages.add("Variable " + variable.getName());
 			}
 		}

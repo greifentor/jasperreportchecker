@@ -73,12 +73,8 @@ public class JRC {
 				if (fileNames.isEmpty()) {
 					out.println("\nNo matching files found!");
 				}
-				somethingPrinted = fileNames
-						.stream()
-						.map(fileName -> checkForFile(fileName, cmd.isSuppressMessageForFileHavingNoUnusedObjects()))
-						.map(s -> !s.isEmpty())
-						.reduce((b0, b1) -> b0 || b1)
-						.orElse(true);
+				somethingPrinted =
+						!check(fileNames, cmd.isSuppressMessageForFileHavingNoUnusedObjects(), null).isEmpty();
 			} else if ("gui".equalsIgnoreCase(args[0])) {
 				String dirName = cmd.getDirectory() != null ? cmd.getDirectory() : ".";
 				new JRCFrame(dirName).setVisible(true);
@@ -111,16 +107,30 @@ public class JRC {
 		} catch (ParseException pe) {
 			out.println("ParseException: " + pe.getMessage());
 		} catch (RuntimeException rte) {
+			rte.printStackTrace();
 			out.println("RuntimeException: " + (rte.getMessage() == null ? rte.getCause() : rte.getMessage()));
 		}
 	}
 
-	public static String checkForFile(String jrxmlFileName, boolean suppressNothingFoundMessage) {
-		List<String> messages = UNUSED_OBJECT_CHECKER.checkForUnusedFieldsParametersAndVariables(jrxmlFileName);
+	public static String check(List<String> fileNames, boolean isSuppressMessageForFileHavingNoUnusedObjects,
+			String excludes) {
+		return fileNames
+				.stream()
+				.map(fileName -> checkForFile(fileName, isSuppressMessageForFileHavingNoUnusedObjects, excludes))
+				.filter(s -> !s.isEmpty())
+				.reduce((s0, s1) -> s0 + "\n" + s1)
+				.orElse("");
+	}
+
+	public static String checkForFile(String jrxmlFileName, boolean suppressNothingFoundMessage, String excludes) {
+		List<String> messages =
+				UNUSED_OBJECT_CHECKER.checkForUnusedFieldsParametersAndVariables(jrxmlFileName, excludes);
 		boolean suppressMessages = isMessageToSuppress(messages, suppressNothingFoundMessage);
 		StringBuilder sb = new StringBuilder();
 		if (!suppressMessages) {
-			out.println("\nProcessing: " + jrxmlFileName);
+			String message = "\nProcessing: " + jrxmlFileName;
+			out.println(message);
+			sb.append(message + "\n");
 		}
 		if (messages.isEmpty()) {
 			if (!suppressMessages) {
@@ -130,7 +140,7 @@ public class JRC {
 			}
 		} else {
 			messages.stream().sorted((s0, s1) -> s0.compareTo(s1)).forEach(s -> {
-				System.out.println(s);
+				out.println(s);
 				sb.append(s + "\n");
 			});
 		}

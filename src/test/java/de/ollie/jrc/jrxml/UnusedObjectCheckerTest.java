@@ -1,5 +1,6 @@
 package de.ollie.jrc.jrxml;
 
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -21,7 +22,15 @@ class UnusedObjectCheckerTest {
 	void returnsAnUnusedField() {
 		assertTrue(
 				unitUnderTest
-						.checkForUnusedFieldsParametersAndVariables(JRXML_FILE_NAME)
+						.checkForUnusedFieldsParametersAndVariables(JRXML_FILE_NAME, null)
+						.contains("Field unusedField"));
+	}
+
+	@Test
+	void returnsNothingIfTheUnusedFieldIsExcluded() {
+		assertFalse(
+				unitUnderTest
+						.checkForUnusedFieldsParametersAndVariables(JRXML_FILE_NAME, "$F{unusedField}")
 						.contains("Field unusedField"));
 	}
 
@@ -29,7 +38,15 @@ class UnusedObjectCheckerTest {
 	void returnsAnUnusedParameter() {
 		assertTrue(
 				unitUnderTest
-						.checkForUnusedFieldsParametersAndVariables(JRXML_FILE_NAME)
+						.checkForUnusedFieldsParametersAndVariables(JRXML_FILE_NAME, null)
+						.contains("Parameter unusedParameter"));
+	}
+
+	@Test
+	void returnsNothingIfTheUnusedParameterIsExcluded() {
+		assertFalse(
+				unitUnderTest
+						.checkForUnusedFieldsParametersAndVariables(JRXML_FILE_NAME, "$P{unusedParameter}")
 						.contains("Parameter unusedParameter"));
 	}
 
@@ -37,7 +54,15 @@ class UnusedObjectCheckerTest {
 	void returnsAnUnusedVariable() {
 		assertTrue(
 				unitUnderTest
-						.checkForUnusedFieldsParametersAndVariables(JRXML_FILE_NAME)
+						.checkForUnusedFieldsParametersAndVariables(JRXML_FILE_NAME, null)
+						.contains("Variable unusedVariable"));
+	}
+
+	@Test
+	void returnsNothingIfTheUnusedVariableIsExcluded() {
+		assertFalse(
+				unitUnderTest
+						.checkForUnusedFieldsParametersAndVariables(JRXML_FILE_NAME, "$V{unusedVariable}")
 						.contains("Variable unusedVariable"));
 	}
 
@@ -47,7 +72,7 @@ class UnusedObjectCheckerTest {
 				RuntimeException.class,
 				() -> 
 				unitUnderTest
-						.checkForUnusedFieldsParametersAndVariables("/non/existing/file.name")
+						.checkForUnusedFieldsParametersAndVariables("/non/existing/file.name", null)
 						.contains("Variable unusedVariable"));
 	}
 
