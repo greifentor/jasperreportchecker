@@ -73,12 +73,7 @@ public class JRC {
 				if (fileNames.isEmpty()) {
 					out.println("\nNo matching files found!");
 				}
-				somethingPrinted = fileNames
-						.stream()
-						.map(fileName -> checkForFile(fileName, cmd.isSuppressMessageForFileHavingNoUnusedObjects()))
-						.map(s -> !s.isEmpty())
-						.reduce((b0, b1) -> b0 || b1)
-						.orElse(true);
+				somethingPrinted = !check(fileNames, cmd.isSuppressMessageForFileHavingNoUnusedObjects()).isEmpty();
 			} else if ("gui".equalsIgnoreCase(args[0])) {
 				String dirName = cmd.getDirectory() != null ? cmd.getDirectory() : ".";
 				new JRCFrame(dirName).setVisible(true);
@@ -113,6 +108,14 @@ public class JRC {
 		} catch (RuntimeException rte) {
 			out.println("RuntimeException: " + (rte.getMessage() == null ? rte.getCause() : rte.getMessage()));
 		}
+	}
+
+	public static String check(List<String> fileNames, boolean isSuppressMessageForFileHavingNoUnusedObjects) {
+		return fileNames
+				.stream()
+				.map(fileName -> checkForFile(fileName, isSuppressMessageForFileHavingNoUnusedObjects))
+				.reduce((s0, s1) -> s0 + "\n" + s1)
+				.orElse("");
 	}
 
 	public static String checkForFile(String jrxmlFileName, boolean suppressNothingFoundMessage) {

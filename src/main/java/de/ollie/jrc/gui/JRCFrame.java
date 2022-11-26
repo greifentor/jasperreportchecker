@@ -30,6 +30,7 @@ import javax.swing.border.EmptyBorder;
 import javax.xml.bind.JAXBException;
 
 import de.ollie.jrc.DirectoryScanner;
+import de.ollie.jrc.FileNameProvider;
 import de.ollie.jrc.JRC;
 import de.ollie.jrc.gui.ResourceManager.Localization;
 import de.ollie.jrc.jrxml.FileReader;
@@ -46,9 +47,9 @@ public class JRCFrame extends JFrame implements WindowListener {
 	static final int HGAP = 3;
 	static final int VGAP = 3;
 
+	private static final CorrectFileSelectionChecker CORRECT_FILE_SELECTION_CHECKER = new CorrectFileSelectionChecker();
+	private static final FileNameProvider FILE_NAME_PROVIDER = new FileNameProvider();
 	private static final Logger LOGGER = Logger.getLogger(JRCFrame.class.getSimpleName());
-
-	private static final CorrectFileSelectionChecker correctFileSelectionChecker = new CorrectFileSelectionChecker();
 
 	private FilenameSelectorComponentFactory fnscf = new FilenameSelectorComponentFactory() {
 
@@ -107,7 +108,7 @@ public class JRCFrame extends JFrame implements WindowListener {
 				new FilenameSelector(
 						path,
 						fnscf,
-						newPath -> buttonStart.setEnabled(correctFileSelectionChecker.isValid(newPath, null)));
+						newPath -> buttonStart.setEnabled(CORRECT_FILE_SELECTION_CHECKER.isValid(newPath, null)));
 		JPanel p =
 				createComponentPanel(
 						"check",
@@ -116,10 +117,18 @@ public class JRCFrame extends JFrame implements WindowListener {
 				.add(
 						createButtonPanel(
 								buttonStart,
-								() -> textAreaOutput.setText(JRC.checkForFile(filenameSelectorFile.getPath(), false)),
+								() -> textAreaOutput
+										.setText(JRC.check(getFileNames(filenameSelectorFile.getPath()), false)),
 								() -> filenameSelectorFile.getPath().toLowerCase().endsWith(".jrxml")),
 						BorderLayout.SOUTH);
 		return p;
+	}
+
+	private List<String> getFileNames(String path) {
+		if (path.toLowerCase().endsWith(".jrxml")) {
+			return List.of(path);
+		}
+		return FILE_NAME_PROVIDER.getFileNamesFromCommandLineParameters(List.of(), path, "*.jrxml");
 	}
 
 	private JPanel createFontListerPanel(String path) {

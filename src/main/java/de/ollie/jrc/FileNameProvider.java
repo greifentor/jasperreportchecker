@@ -17,10 +17,18 @@ public class FileNameProvider {
 		return getFilesToCheck(cmd);
 	}
 
+	public List<String> getFileNamesFromCommandLineParameters(List<String> fileNames, String dir, String pattern) {
+		return getFilesToCheck(fileNames, dir, pattern);
+	}
+
 	private List<String> getFilesToCheck(CommandLineData cmd) {
 		List<String> fileNames = getFileNamesFromCommandLine(cmd);
 		String dir = cmd.getDirectory();
 		String pattern = cmd.getFileNamePattern();
+		return getFilesToCheck(fileNames, dir, pattern);
+	}
+
+	private List<String> getFilesToCheck(List<String> fileNames, String dir, String pattern) {
 		if (pattern != null) {
 			if (dir == null) {
 				dir = ".";
