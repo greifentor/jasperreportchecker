@@ -10,7 +10,6 @@ import de.ollie.jrc.util.StringListSplitter;
 
 public class FileNameProvider {
 
-	public static final StringListSplitter STRING_LIST_SPLITTER = new StringListSplitter();
 	public static final DirectoryScanner DIRECTORY_SCANNER = new DirectoryScanner();
 
 	public List<String> getFileNamesFromCommandLineParameters(CommandLineData cmd) {
@@ -45,7 +44,7 @@ public class FileNameProvider {
 	}
 
 	private List<String> getFileNamesFromCommandLine(CommandLineData cmd) {
-		return cmd.getFileName() != null ? STRING_LIST_SPLITTER.split(cmd.getFileName()) : new ArrayList<>();
+		return cmd.getFileName() != null ? StringListSplitter.INSTANCE.split(cmd.getFileName()) : new ArrayList<>();
 	}
 
 }

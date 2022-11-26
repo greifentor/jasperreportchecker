@@ -9,6 +9,8 @@ import java.util.StringTokenizer;
  */
 public class StringListSplitter {
 
+	public static final StringListSplitter INSTANCE = new StringListSplitter();
+
 	/**
 	 * Separates elements of a comma separated string into a string list.
 	 * 

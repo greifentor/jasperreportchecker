@@ -76,10 +76,10 @@ public class JRCFrame extends JFrame implements WindowListener {
 
 	public JRCFrame(String dirName) {
 		super("JRC");
+		localization = Localization.valueOf(System.getProperty("jrc.language", localization.name()).toUpperCase());
 		textAreaOutput = new JTextArea(40, 20);
 		textAreaOutput.setFont(new Font("monospaced", Font.PLAIN, 11));
 		String path = Path.of(dirName).toAbsolutePath().toString();
-		localization = Localization.valueOf(System.getProperty("jrc.language", localization.name()).toUpperCase());
 		addWindowListener(this);
 		setMinimumSize(new Dimension(400, 200));
 		setContentPane(createMainPanel(path));
@@ -103,32 +103,13 @@ public class JRCFrame extends JFrame implements WindowListener {
 	}
 
 	private JPanel createCheckPanel(String path) {
-		JButton buttonStart = new JButton(getResource("buttons.start.label"));
-		FilenameSelector filenameSelectorFile =
-				new FilenameSelector(
-						path,
-						fnscf,
-						newPath -> buttonStart.setEnabled(CORRECT_FILE_SELECTION_CHECKER.isValid(newPath, null)));
-		JPanel p =
-				createComponentPanel(
-						"check",
-						new ComponentData("check.filenameselectorfile.label", filenameSelectorFile));
-		p
-				.add(
-						createButtonPanel(
-								buttonStart,
-								() -> textAreaOutput
-										.setText(JRC.check(getFileNames(filenameSelectorFile.getPath()), false)),
-								() -> filenameSelectorFile.getPath().toLowerCase().endsWith(".jrxml")),
-						BorderLayout.SOUTH);
-		return p;
-	}
-
-	private List<String> getFileNames(String path) {
-		if (path.toLowerCase().endsWith(".jrxml")) {
-			return List.of(path);
-		}
-		return FILE_NAME_PROVIDER.getFileNamesFromCommandLineParameters(List.of(), path, "*.jrxml");
+		return new CheckPanel(
+				localization,
+				FILE_NAME_PROVIDER,
+				textAreaOutput,
+				path,
+				fnscf,
+				CORRECT_FILE_SELECTION_CHECKER);
 	}
 
 	private JPanel createFontListerPanel(String path) {
@@ -138,6 +119,7 @@ public class JRCFrame extends JFrame implements WindowListener {
 		JPanel p =
 				createComponentPanel(
 						"fontlister",
+						localization,
 						new ComponentData("fontlister.filenameselectordirectory.label", filenameSelectorDirectory),
 						new ComponentData("fontlister.textfieldexclude.label", textFieldExclude));
 		p
@@ -179,7 +161,7 @@ public class JRCFrame extends JFrame implements WindowListener {
 		textAreaOutput.setText(sb.toString());
 	}
 
-	private JPanel createButtonPanel(JButton buttonStart, Runnable starter, BooleanSupplier enabledChecker) {
+	static JPanel createButtonPanel(JButton buttonStart, Runnable starter, BooleanSupplier enabledChecker) {
 		JPanel buttons = new JPanel(new FlowLayout(FlowLayout.RIGHT, HGAP, VGAP));
 		buttonStart.addActionListener(e -> starter.run());
 		buttonStart.setEnabled(enabledChecker.getAsBoolean());
@@ -189,13 +171,14 @@ public class JRCFrame extends JFrame implements WindowListener {
 
 	@AllArgsConstructor
 	@Getter
-	private static class ComponentData {
+	static class ComponentData {
 
 		String resourceId;
 		Component component;
 	}
 
-	private JPanel createComponentPanel(String descriptionResourceIdPrefix, ComponentData... componentData) {
+	static JPanel createComponentPanel(String descriptionResourceIdPrefix, Localization localization,
+			ComponentData... componentData) {
 		JPanel p = new JPanel(new BorderLayout(HGAP, VGAP));
 		p.setBorder(new EmptyBorder(VGAP, HGAP, VGAP, HGAP));
 		int rows = componentData.length;
@@ -203,10 +186,15 @@ public class JRCFrame extends JFrame implements WindowListener {
 		JPanel components = new JPanel(new GridLayout(rows, 1, HGAP, VGAP));
 		JPanel panel = new JPanel(new BorderLayout(HGAP, VGAP));
 		for (ComponentData cd : componentData) {
-			labels.add(new JLabel(getResource(cd.getResourceId())));
+			labels.add(new JLabel(ResourceManager.INSTANCE.getString(localization, cd.getResourceId())));
 			components.add(cd.getComponent());
 		}
-		JTextArea description = new JTextArea(getResource(descriptionResourceIdPrefix + ".description.text"), 4, 40);
+		JTextArea description =
+				new JTextArea(
+						ResourceManager.INSTANCE
+								.getString(localization, descriptionResourceIdPrefix + ".description.text"),
+						4,
+						40);
 		description.setEditable(false);
 		description.setLineWrap(true);
 		panel.add(new JScrollPane(description), BorderLayout.NORTH);
@@ -227,6 +215,7 @@ public class JRCFrame extends JFrame implements WindowListener {
 		JPanel p =
 				createComponentPanel(
 						"usage",
+						localization,
 						new ComponentData(
 								"usage.filenameselectorreportsdirectory.label",
 								filenameSelectorReportsDirectory),
@@ -258,6 +247,7 @@ public class JRCFrame extends JFrame implements WindowListener {
 		JPanel p =
 				createComponentPanel(
 						"xml",
+						localization,
 						new ComponentData(
 								"xml.filenameselectorreportsdirectory.label",
 								filenameSelectorReportsDirectory),
