@@ -62,7 +62,7 @@ class FileNameProviderTest {
 		CommandLineData cmd =
 				new CommandLineParser(new String[] { "-d", "src/test/resources/test-reports/", "-p", "*.jrxml" })
 						.parse();
-		assertEquals(13, unitUnderTest.getFileNamesFromCommandLineParameters(cmd).size());
+		assertEquals(14, unitUnderTest.getFileNamesFromCommandLineParameters(cmd).size());
 		for (String fileName : unitUnderTest.getFileNamesFromCommandLineParameters(cmd)) {
 			assertTrue(fileName.toLowerCase().endsWith(".jrxml"));
 		}

@@ -7,6 +7,7 @@ import java.util.stream.Collectors;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
@@ -17,7 +18,7 @@ import lombok.experimental.Accessors;
 @Accessors(chain = true)
 @Data
 @Generated
-@XmlRootElement(namespace = "")
+@XmlRootElement(name = "jasperReport")
 @XmlAccessorType(XmlAccessType.FIELD) // That's vital to use the other annotations.
 public class JasperReport {
 
@@ -31,6 +32,8 @@ public class JasperReport {
 	private List<Field> fields = new ArrayList<>();
 	@XmlElement(name = "lastPageFooter")
 	private List<LastPageFooter> lastPageFooter = new ArrayList<>();
+	@XmlAttribute
+	private String name; // TODO: That seems not working with JAXB - Change to another XML deserialization!!!
 	@XmlElement(name = "pageFooter")
 	private List<PageFooter> pageFooter = new ArrayList<>();
 	@XmlElement(name = "pageHeader")
