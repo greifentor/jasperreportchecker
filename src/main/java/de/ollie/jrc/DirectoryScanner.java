@@ -14,11 +14,15 @@ public class DirectoryScanner {
 		FileFilter fileFilter = new WildcardFileFilter(pattern);
 		File[] dirs = dir.listFiles(File::isDirectory);
 		File[] files = dir.listFiles(fileFilter);
-		for (int i = 0; i < files.length; i++) {
-			foundPathes.add(files[i]);
+		if (files != null) {
+			for (int i = 0; i < files.length; i++) {
+				foundPathes.add(files[i]);
+			}
 		}
-		for (File d : dirs) {
-			foundPathes.addAll(scan(new ArrayList<>(), d.getAbsolutePath(), pattern));
+		if (dirs != null) {
+			for (File d : dirs) {
+				foundPathes.addAll(scan(new ArrayList<>(), d.getAbsolutePath(), pattern));
+			}
 		}
 		return foundPathes;
 	}

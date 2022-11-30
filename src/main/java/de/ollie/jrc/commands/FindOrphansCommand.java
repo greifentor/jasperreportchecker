@@ -1,8 +1,11 @@
 package de.ollie.jrc.commands;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
 
 import de.ollie.jrc.JasperReportsBundleReader;
 import de.ollie.jrc.jrxml.model.JasperReport;
@@ -17,6 +20,8 @@ import lombok.Getter;
  */
 public class FindOrphansCommand {
 
+	static final String ROOT_DOCUMENT_IDENTIFIER = "(ROOT)";
+
 	@AllArgsConstructor
 	@Getter
 	private static class OrphanSubReportData {
@@ -29,9 +34,7 @@ public class FindOrphansCommand {
 	private final String path;
 
 	private Map<String, JasperReport> jasperReports;
-	private List<String> jasperReportFileNames;
 	private List<OrphanSubReportData> identifiedOrphanSubReportData = new ArrayList<>();
-	private int numberOfScannedReports = 0;
 	private String report;
 
 	public FindOrphansCommand(String path) {
@@ -50,6 +53,16 @@ public class FindOrphansCommand {
 	}
 
 	private void identifyOrphanSubReports() {
+		Set<String> allKeys = new HashSet<>(jasperReports.keySet());
+		for (Entry<String, JasperReport> jasperReportEntry : jasperReports.entrySet()) {
+			jasperReportEntry.getValue().findAllCalledReportsFrom().forEach(allKeys::remove);
+		}
+		allKeys
+				.stream()
+				.filter(s -> !jasperReports.get(s).getName().contains(ROOT_DOCUMENT_IDENTIFIER))
+				.forEach(
+						s -> identifiedOrphanSubReportData
+								.add(new OrphanSubReportData(s, jasperReports.get(s).getName())));
 	}
 
 	private boolean noOrphanSubReportsFound() {
@@ -57,11 +70,17 @@ public class FindOrphansCommand {
 	}
 
 	private void createNoOrphansFoundReport() {
-		report = numberOfScannedReports + " Report Files scanned.\nNo Orphans Sub Reports Found!!!";
+		report = jasperReports.size() + " Report Files scanned.\nNo Orphans Sub Reports Found!!!";
 	}
 
 	private void createOrphanSubReportsReport() {
-		report = "TODO";
+		report = jasperReports.size() + " Report Files scanned.\n\n" //
+				+ "Orphans:\n" //
+				+ identifiedOrphanSubReportData
+						.stream()
+						.map(orphanData -> "- " + orphanData.getFileName())
+						.reduce((s0, s1) -> s0 + "\n" + s1)
+						.orElse("");
 	}
 
 	public String getReport() {
