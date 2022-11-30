@@ -90,6 +90,7 @@ public class JRCFrame extends JFrame implements WindowListener {
 		JPanel p = new JPanel(new BorderLayout(HGAP, VGAP));
 		JTabbedPane tabbedPane = new JTabbedPane(JTabbedPane.LEFT);
 		tabbedPane.add(getResource("tab.header.text.check"), createCheckPanel(path));
+		tabbedPane.add(getResource("tab.header.text.findorphans"), createFindOrphansPanel(path));
 		tabbedPane.add(getResource("tab.header.text.fontlister"), createFontListerPanel(path));
 		tabbedPane.add(getResource("tab.header.text.usage"), createUsagePanel(path));
 		tabbedPane.add(getResource("tab.header.text.xml"), createXMLPanel(path));
@@ -110,6 +111,10 @@ public class JRCFrame extends JFrame implements WindowListener {
 				path,
 				fnscf,
 				CORRECT_FILE_SELECTION_CHECKER);
+	}
+
+	private JPanel createFindOrphansPanel(String path) {
+		return new FindOrphansPanel(localization, textAreaOutput, path, fnscf);
 	}
 
 	private JPanel createFontListerPanel(String path) {
