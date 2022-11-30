@@ -33,7 +33,7 @@ public class JasperReport {
 	@XmlElement(name = "lastPageFooter")
 	private List<LastPageFooter> lastPageFooter = new ArrayList<>();
 	@XmlAttribute
-	private String name; // TODO: That seems not working with JAXB - Change to another XML deserialization!!!
+	private String name;
 	@XmlElement(name = "pageFooter")
 	private List<PageFooter> pageFooter = new ArrayList<>();
 	@XmlElement(name = "pageHeader")
