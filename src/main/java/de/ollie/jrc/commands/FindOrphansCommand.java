@@ -9,6 +9,7 @@ import java.util.Set;
 
 import de.ollie.jrc.JasperReportsBundleReader;
 import de.ollie.jrc.jrxml.model.JasperReport;
+import de.ollie.jrc.jrxml.model.Property;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -21,6 +22,8 @@ import lombok.Getter;
 public class FindOrphansCommand {
 
 	static final String ROOT_DOCUMENT_IDENTIFIER = "(ROOT)";
+
+	private static final String REPORT_DESCRIPTION_PROPERTY_NAME = "com.jaspersoft.studio.report.description";
 
 	@AllArgsConstructor
 	@Getter
@@ -59,10 +62,18 @@ public class FindOrphansCommand {
 		}
 		allKeys
 				.stream()
-				.filter(s -> !jasperReports.get(s).getName().contains(ROOT_DOCUMENT_IDENTIFIER))
+				.filter(s -> !isRootDocument(jasperReports.get(s)))
 				.forEach(
 						s -> identifiedOrphanSubReportData
 								.add(new OrphanSubReportData(s, jasperReports.get(s).getName())));
+	}
+
+	private boolean isRootDocument(JasperReport jasperReport) {
+		return jasperReport
+				.findPropertyByName(REPORT_DESCRIPTION_PROPERTY_NAME)
+				.map(Property::getValue)
+				.map(value -> value.contains(ROOT_DOCUMENT_IDENTIFIER))
+				.orElse(false);
 	}
 
 	private boolean noOrphanSubReportsFound() {
@@ -75,10 +86,13 @@ public class FindOrphansCommand {
 
 	private void createOrphanSubReportsReport() {
 		report = jasperReports.size() + " Report Files scanned.\n\n" //
+				+ identifiedOrphanSubReportData.size()
+				+ " Orphans found.\n\n" //
 				+ "Orphans:\n" //
 				+ identifiedOrphanSubReportData
 						.stream()
 						.map(orphanData -> "- " + orphanData.getFileName())
+						.sorted()
 						.reduce((s0, s1) -> s0 + "\n" + s1)
 						.orElse("");
 	}

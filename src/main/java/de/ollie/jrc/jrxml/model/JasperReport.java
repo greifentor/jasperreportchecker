@@ -40,16 +40,14 @@ public class JasperReport {
 	private List<PageHeader> pageHeader = new ArrayList<>();
 	@XmlElement(name = "parameter")
 	private List<Parameter> parameters = new ArrayList<>();
+	@XmlElement(name = "property")
+	private List<Property> properties = new ArrayList<>();
 	@XmlElement(name = "summary")
 	private List<Summary> summary = new ArrayList<>();
 	@XmlElement(name = "title")
 	private List<Title> title = new ArrayList<>();
 	@XmlElement(name = "variable")
 	private List<Variable> variables = new ArrayList<>();
-
-	public Optional<Field> findFieldByName(String name) {
-		return fields.stream().filter(field -> field.getName().equals(name)).findFirst();
-	}
 
 	public List<String> findAllCalledReportsFrom() {
 		List<String> subreportNames = new ArrayList<>();
@@ -91,4 +89,13 @@ public class JasperReport {
 				.flatMap(bandProvider -> bandProvider.getBands().stream())
 				.collect(Collectors.toList());
 	}
+
+	public Optional<Field> findFieldByName(String name) {
+		return fields.stream().filter(field -> field.getName().equals(name)).findFirst();
+	}
+
+	public Optional<Property> findPropertyByName(String name) {
+		return properties.stream().filter(property -> property.getName().equals(name)).findFirst();
+	}
+
 }
