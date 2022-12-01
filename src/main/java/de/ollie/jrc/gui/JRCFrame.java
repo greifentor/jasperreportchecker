@@ -140,6 +140,7 @@ public class JRCFrame extends JFrame implements WindowListener {
 		FontLister fontLister = new FontLister();
 		List<String> fileNames = files.stream().map(File::getAbsolutePath).sorted().collect(Collectors.toList());
 		StringBuilder sb = new StringBuilder();
+		boolean outputDone = false;
 		for (String fileName : fileNames) {
 			try {
 				JasperReport jasperReport = new FileReader(fileName).readFromFile();
@@ -157,10 +158,14 @@ public class JRCFrame extends JFrame implements WindowListener {
 						System.out.print(o);
 						sb.append(o);
 					});
+					outputDone = true;
 				}
 			} catch (IOException | JAXBException e) {
 				LOGGER.error("something went wrong while reading file for font listing: " + fileName, e);
 			}
+		}
+		if (!outputDone) {
+			sb.append("No Font Information Found!!!");
 		}
 		textAreaOutput.setText(sb.toString());
 	}
