@@ -2,6 +2,7 @@ package de.ollie.jrc.jrxml.model;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlAttribute;
 
 import lombok.Data;
 import lombok.Generated;
@@ -9,9 +10,9 @@ import lombok.Generated;
 @Data
 @Generated
 @XmlAccessorType(XmlAccessType.FIELD)
-public class StaticText implements ReportAndTextElementProvider {
+public class ReportElement {
 
-	private ReportElement reportElement;
-	private TextElement textElement;
+	@XmlAttribute
+	private String uuid;
 
 }

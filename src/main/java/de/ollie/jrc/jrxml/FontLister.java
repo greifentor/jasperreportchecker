@@ -18,8 +18,12 @@ public class FontLister {
 		jasperReport
 				.findAllBands()
 				.stream()
-				.flatMap(band -> band.findAllTextElements().stream())
-				.map(this::getFontName)
+				.flatMap(band -> band.findAllReportAndTextElements().stream())
+				.map(
+						reportAndTextElementProvider -> getFontName(reportAndTextElementProvider.getTextElement())
+								+ " (uuid=\""
+								+ reportAndTextElementProvider.getReportElement().getUuid()
+								+ "\")")
 				.forEach(fontNames::add);
 		return fontNames;
 	}
