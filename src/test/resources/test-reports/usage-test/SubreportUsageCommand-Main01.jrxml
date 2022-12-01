@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- Created with Jaspersoft Studio version 6.6.0.final using JasperReports Library version 6.6.0  -->
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="test-report" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="ce2db436-2153-43c2-939b-69b144b913e6">
+	<property name="com.jaspersoft.studio.report.description" value="(ROOT)"/>
 	<parameter name="SUBREPORT_DIR" class="java.lang.String">
 		<defaultValueExpression><![CDATA["./"]]></defaultValueExpression>
 	</parameter>
@@ -14,7 +15,16 @@
 	<variable name="usedVariable" class="java.lang.String"/>
 	<variable name="unusedVariable" class="java.lang.String"/>
 	<background>
-		<band splitType="Stretch"/>
+		<band height="17" splitType="Stretch">
+			<subreport>
+				<reportElement x="0" y="0" width="469" height="17" uuid="8cc319ff-acd4-4b7e-9cda-e0534711c996"/>
+				<subreportParameter name="SUBREPORT_DIR">
+					<subreportParameterExpression><![CDATA[$P{SUBREPORT_DIR}]]></subreportParameterExpression>
+				</subreportParameter>
+				<dataSourceExpression><![CDATA[new net.sf.jasperreports.engine.JREmptyDataSource()]]></dataSourceExpression>
+				<subreportExpression><![CDATA[$P{SUBREPORT_DIR} + "subreports/SubreportUsageCommand-SubreportInBackground.jasper"]]></subreportExpression>
+			</subreport>
+		</band>
 	</background>
 	<title>
 		<band height="79" splitType="Stretch"/>

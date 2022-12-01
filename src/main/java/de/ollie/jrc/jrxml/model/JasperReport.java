@@ -7,6 +7,7 @@ import java.util.stream.Collectors;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
@@ -17,10 +18,12 @@ import lombok.experimental.Accessors;
 @Accessors(chain = true)
 @Data
 @Generated
-@XmlRootElement(namespace = "")
+@XmlRootElement(name = "jasperReport")
 @XmlAccessorType(XmlAccessType.FIELD) // That's vital to use the other annotations.
 public class JasperReport {
 
+	@XmlElement(name = "background")
+	private List<Background> backgrounds = new ArrayList<>();
 	@XmlElement(name = "columnFooter")
 	private List<ColumnFooter> columnFooter = new ArrayList<>();
 	@XmlElement(name = "columnHeader")
@@ -31,12 +34,16 @@ public class JasperReport {
 	private List<Field> fields = new ArrayList<>();
 	@XmlElement(name = "lastPageFooter")
 	private List<LastPageFooter> lastPageFooter = new ArrayList<>();
+	@XmlAttribute
+	private String name;
 	@XmlElement(name = "pageFooter")
 	private List<PageFooter> pageFooter = new ArrayList<>();
 	@XmlElement(name = "pageHeader")
 	private List<PageHeader> pageHeader = new ArrayList<>();
 	@XmlElement(name = "parameter")
 	private List<Parameter> parameters = new ArrayList<>();
+	@XmlElement(name = "property")
+	private List<Property> properties = new ArrayList<>();
 	@XmlElement(name = "summary")
 	private List<Summary> summary = new ArrayList<>();
 	@XmlElement(name = "title")
@@ -44,12 +51,9 @@ public class JasperReport {
 	@XmlElement(name = "variable")
 	private List<Variable> variables = new ArrayList<>();
 
-	public Optional<Field> findFieldByName(String name) {
-		return fields.stream().filter(field -> field.getName().equals(name)).findFirst();
-	}
-
 	public List<String> findAllCalledReportsFrom() {
 		List<String> subreportNames = new ArrayList<>();
+		subreportNames.addAll(findAllCalledReportsFromBands(getBackgrounds()));
 		subreportNames.addAll(findAllCalledReportsFromBands(getColumnFooter()));
 		subreportNames.addAll(findAllCalledReportsFromBands(getColumnHeader()));
 		subreportNames.addAll(findAllCalledReportsFromBands(getDetails()));
@@ -88,4 +92,13 @@ public class JasperReport {
 				.flatMap(bandProvider -> bandProvider.getBands().stream())
 				.collect(Collectors.toList());
 	}
+
+	public Optional<Field> findFieldByName(String name) {
+		return fields.stream().filter(field -> field.getName().equals(name)).findFirst();
+	}
+
+	public Optional<Property> findPropertyByName(String name) {
+		return properties.stream().filter(property -> property.getName().equals(name)).findFirst();
+	}
+
 }
