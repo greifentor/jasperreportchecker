@@ -42,21 +42,25 @@ public class FontListerTest {
 		@Test
 		void returnsSetWithTheCorrectSize_passingAJasperReportWithContent() throws Exception {
 			JasperReport jasperReport = new FileReader(XML_FILE_NAME).readFromFile();
-			assertEquals(2, unitUnderTest.getUsedFontNames(jasperReport).size());
+			assertEquals(6, unitUnderTest.getUsedFontNames(jasperReport).size());
 		}
 
 		@Test
 		void returnsASetWithTheFontNamesContainingDEFAULT_passingAJasperReportWithContentWithDefaultFont()
 				throws Exception {
 			JasperReport jasperReport = new FileReader(XML_FILE_NAME).readFromFile();
-			assertTrue(unitUnderTest.getUsedFontNames(jasperReport).contains(FontLister.DEFAULT));
+			assertTrue(
+					unitUnderTest
+							.getUsedFontNames(jasperReport)
+							.stream()
+							.anyMatch(s -> s.startsWith(FontLister.DEFAULT)));
 		}
 
 		@Test
 		void returnsASetWithTheFontNamesContainingTheFontName_passingAJasperReportWithContentWithFont()
 				throws Exception {
 			JasperReport jasperReport = new FileReader(XML_FILE_NAME).readFromFile();
-			assertTrue(unitUnderTest.getUsedFontNames(jasperReport).contains("Monospaced"));
+			assertTrue(unitUnderTest.getUsedFontNames(jasperReport).stream().anyMatch(s -> s.startsWith("Monospaced")));
 		}
 
 	}

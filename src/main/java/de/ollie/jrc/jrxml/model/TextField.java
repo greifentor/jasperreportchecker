@@ -9,8 +9,9 @@ import lombok.Generated;
 @Data
 @Generated
 @XmlAccessorType(XmlAccessType.FIELD)
-public class TextField implements TextElementProvider {
+public class TextField implements ReportAndTextElementProvider {
 
+	private ReportElement reportElement;
 	private TextElement textElement;
 
 }

@@ -2,7 +2,6 @@ package de.ollie.jrc.jrxml.model;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -23,15 +22,11 @@ public class Band {
 	@XmlElement(name = "textField")
 	private List<TextField> textFields = new ArrayList<>();
 
-	public List<TextElement> findAllTextElements() {
-		List<TextElement> textElements = new ArrayList<>();
-		textElements.addAll(findAllTextElements(staticTexts));
-		textElements.addAll(findAllTextElements(textFields));
-		return textElements;
-	}
-
-	private List<TextElement> findAllTextElements(List<? extends TextElementProvider> textElementProviders) {
-		return textElementProviders.stream().map(TextElementProvider::getTextElement).collect(Collectors.toList());
+	public List<ReportAndTextElementProvider> findAllReportAndTextElements() {
+		List<ReportAndTextElementProvider> reportAndTextElementProviders = new ArrayList<>();
+		reportAndTextElementProviders.addAll(staticTexts);
+		reportAndTextElementProviders.addAll(textFields);
+		return reportAndTextElementProviders;
 	}
 
 }
