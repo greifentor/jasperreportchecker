@@ -72,7 +72,7 @@ public class JRCFrame extends JFrame implements WindowListener {
 
 	private JTextArea textAreaOutput;
 
-	private Localization localization = Localization.DE;
+	private Localization localization = Localization.EN;
 
 	public JRCFrame(String dirName) {
 		super("JRC");

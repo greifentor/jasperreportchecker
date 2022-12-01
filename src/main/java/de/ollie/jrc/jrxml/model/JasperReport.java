@@ -22,6 +22,8 @@ import lombok.experimental.Accessors;
 @XmlAccessorType(XmlAccessType.FIELD) // That's vital to use the other annotations.
 public class JasperReport {
 
+	@XmlElement(name = "background")
+	private List<Background> backgrounds = new ArrayList<>();
 	@XmlElement(name = "columnFooter")
 	private List<ColumnFooter> columnFooter = new ArrayList<>();
 	@XmlElement(name = "columnHeader")
@@ -51,6 +53,7 @@ public class JasperReport {
 
 	public List<String> findAllCalledReportsFrom() {
 		List<String> subreportNames = new ArrayList<>();
+		subreportNames.addAll(findAllCalledReportsFromBands(getBackgrounds()));
 		subreportNames.addAll(findAllCalledReportsFromBands(getColumnFooter()));
 		subreportNames.addAll(findAllCalledReportsFromBands(getColumnHeader()));
 		subreportNames.addAll(findAllCalledReportsFromBands(getDetails()));

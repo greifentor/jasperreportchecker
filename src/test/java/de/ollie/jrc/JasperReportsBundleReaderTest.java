@@ -30,7 +30,7 @@ public class JasperReportsBundleReaderTest {
 		@Test
 		void returnsAMapWithCorrectReportCount_passingAPathWithReportFiles() {
 			assertEquals(
-					5,
+					6,
 					unitUnderTest
 							.findAllJasperReportsInPathByRelativeFileName("src/test/resources/test-reports/usage-test")
 							.size());

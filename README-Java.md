@@ -59,7 +59,14 @@ java -jar target\jasperreportscleaner-1.0.0.jar check -d C:\workspace\document-p
 This command (```gui```) starts the application with a Swing GUI which allows to selected files for a check in a
 comfortable way.
 
-Passing vm argument ``-Djrc.language=EN`` allows to switch the language to english.
+Passing VM argument ``-Djrc.language=DE`` allows to switch the language to German.
 
+|Command     |Description|
+|------------|-----------|
+|Check       |Checks for unused fields, parameters and variables.|
+|Find Orphans|Finds orphaned sub reports in a project.|
+|Font Lister |Lists used fonts in alle documents of a project.|
+|Usage       |Creates a PlantUML diagram with the report relations.|
+|XML         |Creates a sample XML for a specified report (not 100% complete until now).|
 
-### Orphans
+All commands could be selected by the tabs when the application is started. Descriptions of application behavior are to find in the top field of any command panel.
