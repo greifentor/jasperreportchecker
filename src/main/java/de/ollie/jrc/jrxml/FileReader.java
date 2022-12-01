@@ -40,8 +40,10 @@ public class FileReader {
 	private void cleanUpJasperReportTag() {
 		int i = findFirstLineWithJasperReportTag();
 		if (i > -1) {
+			String s = lines.get(i);
+			s = s.substring(s.indexOf("name=\""));
 			lines.remove(i);
-			lines.add(i, "<jasperReport>");
+			lines.add(i, "<jasperReport " + s);
 		}
 	}
 
