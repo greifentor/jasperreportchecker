@@ -54,7 +54,7 @@ class StartsWithCommandTest {
 			// Run
 			Value returned = (Value) unitUnderTest.exec(ExpressionStack.of(value0, value1)).pop();
 			// Run & Check
-			assertTrue(returned.asBoolean());
+			assertTrue(returned.getValueAsBoolean());
 		}
 
 		@Test

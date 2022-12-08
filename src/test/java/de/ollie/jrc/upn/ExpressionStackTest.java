@@ -1,5 +1,6 @@
 package de.ollie.jrc.upn;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -11,8 +12,13 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import de.ollie.jrc.upn.ExpressionStack.NotAValueExpressionException;
 import de.ollie.jrc.upn.ExpressionStack.PopOnEmptyStackException;
+import de.ollie.jrc.upn.ExpressionStack.UnsuitableTypeRequestedByPopException;
+import de.ollie.jrc.upn.model.CommandExpression;
 import de.ollie.jrc.upn.model.Expression;
+import de.ollie.jrc.upn.model.Type;
+import de.ollie.jrc.upn.model.Value;
 
 @ExtendWith(MockitoExtension.class)
 public class ExpressionStackTest {
@@ -78,6 +84,32 @@ public class ExpressionStackTest {
 		void throwsAnExceptionWithAReferenceToTheStack_callingPopOnAnEmptyStack() {
 			PopOnEmptyStackException e = assertThrows(PopOnEmptyStackException.class, () -> unitUnderTest.pop());
 			assertSame(unitUnderTest, e.getStack());
+		}
+
+	}
+
+	@Nested
+	class TestsOfMethod_popString {
+
+		@Test
+		void returnsTheStringOfTheValue_havingAStringValueOnTop() {
+			// Prepare
+			String s = "string";
+			unitUnderTest.push(new Value().setType(Type.STRING).setValue(s));
+			// Run & Check
+			assertEquals(s, unitUnderTest.popString());
+		}
+
+		@Test
+		void throwsAnException_havingACommandOnTop() {
+			unitUnderTest.push(CommandExpression.STARTS_WITH);
+			assertThrows(NotAValueExpressionException.class, () -> unitUnderTest.popString());
+		}
+
+		@Test
+		void throwsAnException_havingANonStringValueOnTop() {
+			unitUnderTest.push(new Value().setType(Type.BOOLEAN).setValue("true"));
+			assertThrows(UnsuitableTypeRequestedByPopException.class, () -> unitUnderTest.popString());
 		}
 
 	}
