@@ -12,6 +12,10 @@ public class Value implements Expression {
 	private String value;
 	private Type type;
 
+	public Boolean asBoolean() {
+		return false;
+	}
+
 	@Override
 	public String getToken() {
 		return value + "$" + type.name();

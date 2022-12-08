@@ -1,5 +1,7 @@
 package de.ollie.jrc.util;
 
+import java.util.function.Supplier;
+
 public class Checks {
 
 	Checks() {
@@ -12,13 +14,13 @@ public class Checks {
 		}
 	}
 
-//	public static <T extends Exception> void ensure(boolean condition, T exception) throws T {
-//		if (exception == null) {
-//			throw new NullPointerException("exception cannot be null.");
-//		}
-//		if (!condition) {
-//			throw exception;
-//		}
-//	}
+	public static <T extends Exception> void ensure(boolean condition, Supplier<T> exceptionSupplier) throws T {
+		if (exceptionSupplier == null) {
+			throw new NullPointerException("exception cannot be null.");
+		}
+		if (!condition) {
+			throw exceptionSupplier.get();
+		}
+	}
 
 }
