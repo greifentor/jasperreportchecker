@@ -3,19 +3,32 @@ package de.ollie.jrc.jrxml;
 import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
 import java.util.function.BiConsumer;
 
 import de.ollie.jrc.jrxml.model.JasperReport;
 import de.ollie.jrc.util.FileNames;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
 
 public class DependencyDiagramBuilder {
+
+	@AllArgsConstructor
+	@Getter
+	private class DependencyInformation {
+
+		private String dependentReportName;
+		private boolean root;
+	}
 
 	private String fileName;
 	private PrintStream out;
 	private Map<String, JasperReport> reports;
-	private Map<String, List<String>> dependencyMapping;
+	private Map<String, List<DependencyInformation>> dependencyMapping;
 	private StringBuilder output = new StringBuilder();
 
 	public DependencyDiagramBuilder(String fileName, Map<String, JasperReport> reports, PrintStream out) {
@@ -30,6 +43,7 @@ public class DependencyDiagramBuilder {
 	public synchronized String build() {
 		writeUMLStart();
 		initializeDependencyMapping();
+		writeRootComponentDefinitions();
 		writeDependenciesAsUMLComponentDiagramToOut();
 		writeUMLEnd();
 		return output.toString();
@@ -59,13 +73,28 @@ public class DependencyDiagramBuilder {
 
 	private void setDependencyForEachCalledReportForPassedName(List<String> calledReports, String dependencyName) {
 		calledReports.forEach(reportName -> {
-			List<String> l = dependencyMapping.getOrDefault(reportName, new ArrayList<>());
-			l.add(dependencyName);
+			List<DependencyInformation> l = dependencyMapping.getOrDefault(reportName, new ArrayList<>());
+			l
+					.add(
+							new DependencyInformation(
+									dependencyName,
+									Optional
+											.ofNullable(reports.get(dependencyName))
+											.map(this::isRootReport)
+											.orElse(false)));
 			dependencyMapping.put(reportName, l);
 		});
 	}
 
-	// OLI: That's for the whole directory --- too much ;)
+	private boolean isRootReport(JasperReport report) {
+		return report
+				.findPropertyByName("com.jaspersoft.studio.report.description")
+				.filter(property -> property.getValue() != null)
+				.map(property -> property.getValue().contains("(ROOT)"))
+				.orElse(false);
+	}
+
+// OLI: That's for the whole directory --- too much ;)
 //	private void writeDependenciesAsUMLComponentDiagramToOut() {
 //		for (String reportName : dependencyMapping.keySet()) {
 //			dependencyMapping
@@ -76,16 +105,33 @@ public class DependencyDiagramBuilder {
 //		}
 //	}
 
+	private void writeRootComponentDefinitions() {
+		writeRootComponentDefinitions(fileName, new HashSet<>());
+	}
+
+	private void writeRootComponentDefinitions(String reportName, Set<String> alreadySetRoots) {
+		dependencyMapping.getOrDefault(reportName, new ArrayList<>()).forEach(dependencyInformation -> {
+			String dependencyReportName = dependencyInformation.getDependentReportName();
+			if (dependencyInformation.isRoot() && !alreadySetRoots.contains(dependencyReportName)) {
+				String s = "Component \"" + dependencyReportName + "\" <<ROOT>>\n";
+				out.print(s);
+				output.append(s);
+				alreadySetRoots.add(dependencyReportName);
+			}
+			writeRootComponentDefinitions(dependencyReportName, alreadySetRoots);
+		});
+	}
+
 	private void writeDependenciesAsUMLComponentDiagramToOut() {
 		writeDependenciesAsUMLComponentDiagramToOut(fileName);
 	}
 
 	private void writeDependenciesAsUMLComponentDiagramToOut(String reportName) {
-		dependencyMapping.getOrDefault(reportName, new ArrayList<>()).forEach(dependentReportName -> {
-			String s = "[" + reportName + "] <-- [" + dependentReportName + "]\n";
+		dependencyMapping.getOrDefault(reportName, new ArrayList<>()).forEach(dependencyInformation -> {
+			String s = "[" + reportName + "] <-- [" + dependencyInformation.getDependentReportName() + "]\n";
 			out.print(s);
 			output.append(s);
-			writeDependenciesAsUMLComponentDiagramToOut(dependentReportName);
+			writeDependenciesAsUMLComponentDiagramToOut(dependencyInformation.getDependentReportName());
 		});
 	}
 
