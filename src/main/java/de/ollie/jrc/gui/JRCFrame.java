@@ -28,6 +28,8 @@ import javax.swing.JTextField;
 import javax.swing.border.EmptyBorder;
 import javax.xml.bind.JAXBException;
 
+import org.apache.commons.lang3.StringUtils;
+
 import de.ollie.jrc.DirectoryScanner;
 import de.ollie.jrc.FileNameProvider;
 import de.ollie.jrc.JRC;
@@ -137,6 +139,7 @@ public class JRCFrame extends JFrame implements WindowListener {
 
 	private void listFonts(String directory, String exclude) {
 		List<File> files = new DirectoryScanner().scan(new ArrayList<>(), directory, "*.jrxml");
+		List<String> excludes = readExcludes(exclude);
 		FontLister fontLister = new FontLister();
 		List<String> fileNames = files.stream().map(File::getAbsolutePath).sorted().collect(Collectors.toList());
 		StringBuilder sb = new StringBuilder();
@@ -147,7 +150,7 @@ public class JRCFrame extends JFrame implements WindowListener {
 				List<String> fontNames = fontLister
 						.getUsedFontNames(jasperReport)
 						.stream()
-						.filter(fontName -> !isExcluded(fontName, exclude))
+						.filter(fontName -> !isExcluded(fontName, excludes))
 						.collect(Collectors.toList());
 				if (!fontNames.isEmpty()) {
 					String s = fileName + ":\n";
@@ -170,8 +173,12 @@ public class JRCFrame extends JFrame implements WindowListener {
 		textAreaOutput.setText(sb.toString());
 	}
 
-	private boolean isExcluded(String fontName, String exclude) {
-		return (exclude != null) && !exclude.isEmpty() && fontName.startsWith(exclude);
+	private List<String> readExcludes(String exclude) {
+		return exclude == null ? List.of() : List.of(StringUtils.split(exclude, ","));
+	}
+
+	private boolean isExcluded(String fontName, List<String> excludes) {
+		return excludes.stream().anyMatch(fontName::startsWith);
 	}
 
 	static JPanel createButtonPanel(JButton buttonStart, Runnable starter, BooleanSupplier enabledChecker) {
