@@ -82,6 +82,7 @@ class JRCTest {
 		void passNoExistingFile_printsAnErrorMessage() {
 			String fileName = "not/existing/f.ile";
 			JRC.main(new String[] { "check", "-f", fileName });
+			System.out.println("<" + baos.toString() + ">");
 			assertTrue(baos.toString().contains("NoSuchFileException:"));
 		}
 
@@ -96,7 +97,6 @@ class JRCTest {
 		void passFileWithNoUnusedObjectAndSuppressNothingFoundMessage_printsNothing() {
 			String fileName = "src/test/resources/test-reports/UnusedObjectChecker-NoUnused.jrxml";
 			JRC.main(new String[] { "check", "-f", fileName, "-snfm" });
-			System.out.println("\"" + baos.toString() + "\"");
 			assertTrue(baos.toString().isEmpty());
 		}
 
@@ -171,21 +171,19 @@ class JRCTest {
 			String fileName =
 					"src/test/resources/test-reports/usage-test/subsubreports/SubreportUsageCommand-SubSubreport.jrxml";
 			JRC.main(new String[] { "usage", "-f", fileName, "-d", "src/test/resources/test-reports/usage-test" });
-			assertEquals(
-					"@startuml" + //
-							"[subsubreports/SubreportUsageCommand-SubSubreport.jrxml]" + //
-							"[subsubreports/SubreportUsageCommand-SubSubreport.jrxml] <-- [subreports/SubreportUsageCommand-SubreportInBackground.jrxml]"
-							+ //
-							"[subreports/SubreportUsageCommand-SubreportInBackground.jrxml] <-- [SubreportUsageCommand-Main01.jrxml]"
-							+ // "
-							"[subsubreports/SubreportUsageCommand-SubSubreport.jrxml] <-- [subreports/SubreportUsageCommand-Subreport01.jrxml]"
-							+ //
-							"[subreports/SubreportUsageCommand-Subreport01.jrxml] <-- [SubreportUsageCommand-Main01.jrxml]"
-							+ //
-							"[subsubreports/SubreportUsageCommand-SubSubreport.jrxml] <-- [subreports/SubreportUsageCommand-Subreport02.jrxml]"
-							+ //
-							"@enduml",
-					baos.toString().replace("\r", "").replace("\n", ""));
+			assertEquals("@startuml" + //
+					"[subsubreports/SubreportUsageCommand-SubSubreport.jrxml]" + //
+					"[subsubreports/SubreportUsageCommand-SubSubreport.jrxml] <-- [subreports/SubreportUsageCommand-SubreportInBackground.jrxml]"
+					+ //
+					"[subreports/SubreportUsageCommand-SubreportInBackground.jrxml] <-- [SubreportUsageCommand-Main01.jrxml]"
+					+ // "
+					"[subsubreports/SubreportUsageCommand-SubSubreport.jrxml] <-- [subreports/SubreportUsageCommand-Subreport01.jrxml]"
+					+ //
+					"[subreports/SubreportUsageCommand-Subreport01.jrxml] <-- [SubreportUsageCommand-Main01.jrxml]"
+					+ //
+					"[subsubreports/SubreportUsageCommand-SubSubreport.jrxml] <-- [subreports/SubreportUsageCommand-Subreport02.jrxml]"
+					+ //
+					"@enduml", baos.toString().replace("\r", "").replace("\n", ""));
 		}
 
 	}

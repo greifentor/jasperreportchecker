@@ -1,12 +1,9 @@
 package de.ollie.jrc.jrxml;
 
-import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
-
-import javax.xml.bind.JAXBException;
 
 import de.ollie.jrc.jrxml.model.Field;
 import de.ollie.jrc.jrxml.model.JasperReport;
@@ -21,7 +18,8 @@ public class UnusedObjectChecker {
 			JasperReport jasperReport = new FileReader(jrxmlFileName).readFromFile();
 			String fileContent = Files.readString(Path.of(jrxmlFileName));
 			return listUnusedFieldsParametersAndVariablesToConsole(jasperReport, fileContent, excludes);
-		} catch (IOException | JAXBException e) {
+		} catch (Exception e) {
+			e.printStackTrace();
 			throw new RuntimeException(
 					"something went wrong while reading the JRXML file (" + jrxmlFileName
 							+ "): "
@@ -31,8 +29,8 @@ public class UnusedObjectChecker {
 		}
 	}
 
-	private List<String> listUnusedFieldsParametersAndVariablesToConsole(JasperReport jasperReport,
-			String fileContent, String excludes) {
+	private List<String> listUnusedFieldsParametersAndVariablesToConsole(JasperReport jasperReport, String fileContent,
+			String excludes) {
 		List<String> messages = new ArrayList<>();
 		List<String> exclude = StringListSplitter.INSTANCE.split(excludes);
 		exclude = exclude != null ? exclude : List.of();
