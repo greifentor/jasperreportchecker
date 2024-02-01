@@ -12,13 +12,10 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
-import de.ollie.jrc.jrxml.NodeSampleDataGenerator;
-
 class JRCTest {
 
 	private static final String XML_FILE_NAME =
 			"src/test/resources/test-reports/UnusedObjectChecker-FieldsParametersAndVariables.jrxml";
-	private static final String UNKNOWN = NodeSampleDataGenerator.UNKNOWN;
 
 	private ByteArrayOutputStream baos = new ByteArrayOutputStream();
 

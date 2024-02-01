@@ -1,0 +1,1 @@
+java -jar target\jasperreportscleaner-1.1.1.jar gui

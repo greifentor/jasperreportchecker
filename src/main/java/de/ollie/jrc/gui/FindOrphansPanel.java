@@ -36,7 +36,8 @@ public class FindOrphansPanel extends JPanel implements FocusListener {
 				JRCFrame
 						.createButtonPanel(
 								buttonStart,
-								() -> textAreaOutput.setText(new FindOrphansCommand(path).getReport()),
+								() -> textAreaOutput
+										.setText(new FindOrphansCommand(filenameSelectorFile.getPath()).getReport()),
 								() -> new File(filenameSelectorFile.getPath()).isDirectory()),
 				BorderLayout.SOUTH);
 	}
