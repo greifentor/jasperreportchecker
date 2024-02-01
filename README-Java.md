@@ -28,6 +28,14 @@ The version "1.0.0" may change.
 
 The application will execute the passed command with the passed options.
 
+**OR**
+
+Start the application in GUI mode with
+
+```start-gui.bat```
+
+using Windows OS.
+
 ## Commands
 
 ### Check
