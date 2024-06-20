@@ -80,7 +80,7 @@ public class JRCFrame extends JFrame implements WindowListener {
 		localization = Localization.valueOf(System.getProperty("jrc.language", localization.name()).toUpperCase());
 		textAreaOutput = new JTextArea(40, 20);
 		textAreaOutput.setFont(new Font("monospaced", Font.PLAIN, 11));
-		String path = Path.of(dirName).toAbsolutePath().toString();
+		String path = System.getProperty("jrc.default.path", Path.of(dirName).toAbsolutePath().toString());
 		addWindowListener(this);
 		setMinimumSize(new Dimension(400, 200));
 		setContentPane(createMainPanel(path));
